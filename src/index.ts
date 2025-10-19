@@ -1,7 +1,7 @@
 // path alias configuration
 import "./alias";
 // load environment variables
-import "./loadEnvFile";
+// import "./loadEnvFile";
 
 import cors from "cors";
 import express from "express";
