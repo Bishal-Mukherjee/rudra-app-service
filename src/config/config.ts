@@ -1,15 +1,14 @@
 import dotenv from "dotenv";
-import path from "path";
+dotenv.config({ quiet: true });
 
-const envFile = process.env.ENV_FILE || ".env.development";
-dotenv.config({
-  ...(envFile ? { path: path.resolve(__dirname, "../../", envFile) } : {}),
-  quiet: true,
-});
+if (process.env.NODE_ENV === "development") {
+  dotenv.config({ path: ".env.development", override: true, quiet: true });
+} else if (process.env.NODE_ENV === "staging") {
+  dotenv.config({ path: ".env.staging", override: true });
+}
 
 interface Config {
   port: number;
-  env: string;
   db: {
     host: string;
     port: number;
@@ -125,7 +124,6 @@ const geocodingConfig = () => {
 
 export const config: Config = {
   port: Number(process.env.SERVER_PORT) || 8080,
-  env: process.env.ENV || process.env.NODE_ENV || "development",
   jwtSecret: process.env.JWT_SECRET || "secret",
   db: dbConfig(),
   redis: redisConfig(),

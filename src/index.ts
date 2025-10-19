@@ -1,7 +1,5 @@
 // path alias configuration
 import "./alias";
-// load environment variables
-// import "./loadEnvFile";
 
 import cors from "cors";
 import express from "express";
@@ -79,7 +77,7 @@ const port = config.port;
 app.listen(port, () => {
   console.info(
     `🚀 Server started
-🔸 Environment : ${String(config.env).toUpperCase()}
+🔸 Environment : ${process.env.NODE_ENV}
 🔹 Listening on : http://localhost:${port}`,
   );
 });
