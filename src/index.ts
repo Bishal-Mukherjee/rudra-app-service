@@ -1,5 +1,7 @@
 // path alias configuration
 import "./alias";
+// load environment variables
+import "./loadEnvFile";
 
 import cors from "cors";
 import express from "express";
@@ -42,14 +44,14 @@ pool.connect((err) => {
     console.error("Error connecting to Database", err.message);
     process.exit(1);
   } else {
-    console.info("✅ Connected to database");
+    console.info("🔹 Connected to database");
   }
 });
 
 // Redis Connection
 redisClient
   .connect()
-  .then(() => console.log("✅ Connected to redis"))
+  .then(() => console.log("🔹 Connected to redis"))
   .catch((err: Error) => {
     console.log("Error connecting to Redis");
     console.log(err);
@@ -75,5 +77,9 @@ app.use(errorHandler);
 const port = config.port;
 
 app.listen(port, () => {
-  console.log(`🚀 Server on port ${port}`);
+  console.info(
+    `🚀 Server started
+🔸 Environment : ${String(config.env).toUpperCase()}
+🔹 Listening on : http://localhost:${port}`,
+  );
 });
