@@ -4,6 +4,7 @@ import { redisClient } from "@/config/redis";
 import { DistrictBlocks } from "@/controllers/question/types";
 import { getStaticLookup } from "@/utils/static-lookup";
 import { geocodingApiUrl, reverseGeocodingApiUrl } from "@/constants/constants";
+import { buildReverseGeocodeResult } from "@/controllers/region/helpers";
 
 export const getDistricts = async (
   req: Request,
@@ -101,23 +102,25 @@ export const getReverseGeocode = async (
     }
 
     // TODO: Confirm if rounding is acceptable for the application
-    const roundedLat = Number(lat).toFixed(3) as string;
-    const roundedLng = Number(lng).toFixed(3) as string;
+    const roundedLat = Number(lat).toFixed(3);
+    const roundedLng = Number(lng).toFixed(3);
+    const cacheKey = `reverse_geocode:${roundedLat},${roundedLng}`;
 
-    const cachedData = await redisClient.get(
-      `reverse_geocode:${roundedLat},${roundedLng}`,
-    );
+    const [districtsData, cachedData] = await Promise.all([
+      getStaticLookup("districts"),
+      redisClient.get(cacheKey),
+    ]);
 
     if (cachedData) {
-      res.status(200).json({
-        message: "Location fetched successfully",
-        result: JSON.parse(cachedData),
-      });
+      const parsedCachedData = JSON.parse(cachedData);
+      const result = buildReverseGeocodeResult(parsedCachedData, districtsData);
+      res
+        .status(200)
+        .json({ message: "Location fetched successfully", result });
       return;
     }
 
     const apiUrl = new URL(reverseGeocodingApiUrl);
-
     apiUrl.searchParams.append("lat", lat as string);
     apiUrl.searchParams.append("lng", lng as string);
     apiUrl.searchParams.append("region", "ind");
@@ -129,15 +132,19 @@ export const getReverseGeocode = async (
       return;
     }
 
-    await redisClient.set(
-      `reverse_geocode:${roundedLat},${roundedLng}`,
-      JSON.stringify(response.data.results[0]),
-      { EX: 259200 }, // 72 hours
+    const geocodeData = response.data.results[0];
+
+    redisClient.set(
+      cacheKey,
+      JSON.stringify(geocodeData),
+      { EX: 345600 }, // 96 hours
     );
+
+    const result = buildReverseGeocodeResult(geocodeData, districtsData);
 
     res.status(200).json({
       message: "Location fetched successfully",
-      result: response.data.results[0],
+      result,
     });
   } catch (error) {
     console.error("Error fetching reverse geocode:", error);

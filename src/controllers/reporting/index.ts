@@ -1,14 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "@/config/db";
-import { LIVE_REPORTING, UNKNOWN } from "@/constants/constants";
-import {
-  Reporting,
-  ReportingReqBody,
-  MatchResult,
-} from "@/controllers/reporting/types";
+import { Reporting, ReportingReqBody } from "@/controllers/reporting/types";
 import { postReportingSchema } from "@/controllers/reporting/validations";
-import { findBestMatch } from "@/utils/strings";
-import { getStaticLookup } from "@/utils/static-lookup";
 
 export const postReporting = async (req: Request, res: Response) => {
   const { error } = postReportingSchema.validate(req.body);
@@ -27,30 +20,6 @@ export const postReporting = async (req: Request, res: Response) => {
     const { type } = req.params;
     const body = req.body as ReportingReqBody;
 
-    const districtInUpperCase = String(body.district).toUpperCase();
-    const blockInUpperCase = String(body.block).toUpperCase();
-
-    let m: string | MatchResult = districtInUpperCase || UNKNOWN;
-    let b: string | MatchResult = blockInUpperCase || UNKNOWN;
-
-    if (type === LIVE_REPORTING && m !== UNKNOWN && b !== UNKNOWN) {
-      const [districtsData, blocksData] = (await Promise.all([
-        getStaticLookup("districts"),
-        getStaticLookup("blocks"),
-      ])) as [any[], Record<string, any[]>];
-
-      const matchedDistrict = await Promise.resolve(
-        findBestMatch(m as string, districtsData),
-      );
-
-      const matchedBlock = await Promise.resolve(
-        findBestMatch(b as string, blocksData[matchedDistrict.value] || []),
-      );
-
-      m = matchedDistrict.percentage > 20 ? matchedDistrict.value : UNKNOWN;
-      b = matchedBlock.percentage > 20 ? matchedBlock.value : UNKNOWN;
-    }
-
     await client.query("BEGIN");
 
     const reportingQuery = await client.query(
@@ -66,8 +35,8 @@ export const postReporting = async (req: Request, res: Response) => {
         body.latitude,
         body.longitude,
         body.villageOrGhat,
-        m,
-        b,
+        body.district,
+        body.block,
         body.images || [],
         body.notes,
         type,

@@ -1,14 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "@/config/db";
-import { LIVE_SIGHTING, UNKNOWN } from "@/constants/constants";
-import {
-  Sighting,
-  SightingReqBody,
-  MatchResult,
-} from "@/controllers/sighting/types";
+import { Sighting, SightingReqBody } from "@/controllers/sighting/types";
 import { postSightingSchema } from "@/controllers/sighting/validations";
-import { findBestMatch } from "@/utils/strings";
-import { getStaticLookup } from "@/utils/static-lookup";
 
 export const postSighting = async (req: Request, res: Response) => {
   const { error } = postSightingSchema.validate(req.body);
@@ -27,30 +20,6 @@ export const postSighting = async (req: Request, res: Response) => {
     const { type } = req.params;
     const body = req.body as SightingReqBody;
 
-    const districtInUpperCase = String(body.district).toUpperCase();
-    const blockInUpperCase = String(body.block).toUpperCase();
-
-    let m: string | MatchResult = districtInUpperCase || UNKNOWN;
-    let b: string | MatchResult = blockInUpperCase || UNKNOWN;
-
-    if (type === LIVE_SIGHTING && m !== UNKNOWN && b !== UNKNOWN) {
-      const [districtsData, blocksData] = (await Promise.all([
-        getStaticLookup("districts"),
-        getStaticLookup("blocks"),
-      ])) as [any[], Record<string, any[]>];
-
-      const matchedDistrict = await Promise.resolve(
-        findBestMatch(m as string, districtsData),
-      );
-
-      const matchedBlock = await Promise.resolve(
-        findBestMatch(b as string, blocksData[matchedDistrict.value] || []),
-      );
-
-      m = matchedDistrict.percentage > 20 ? matchedDistrict.value : UNKNOWN;
-      b = matchedBlock.percentage > 20 ? matchedBlock.value : UNKNOWN;
-    }
-
     await client.query("BEGIN");
 
     const query = await client.query(
@@ -64,8 +33,8 @@ export const postSighting = async (req: Request, res: Response) => {
         body.latitude,
         body.longitude,
         body.villageOrGhat,
-        m,
-        b,
+        body.district,
+        body.block,
         body.waterBodyCondition,
         body.weatherCondition,
         body.waterBody,
