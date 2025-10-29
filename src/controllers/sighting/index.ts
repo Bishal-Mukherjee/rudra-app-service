@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { pool } from "@/config/db";
 import { Sighting, SightingReqBody } from "@/controllers/sighting/types";
 import { postSightingSchema } from "@/controllers/sighting/validations";
+import { ALLOWED_STATES } from "@/constants/constants";
+import { normalizeStateName } from "@/utils/strings";
 
 export const postSighting = async (req: Request, res: Response) => {
   const { error } = postSightingSchema.validate(req.body);
@@ -10,6 +12,14 @@ export const postSighting = async (req: Request, res: Response) => {
     res
       .status(400)
       .json({ error: "Validation error", message: error.details[0].message });
+    return;
+  }
+
+  if (!ALLOWED_STATES.includes(normalizeStateName(req.body.state))) {
+    const fetchedState = req.body.state;
+    res
+      .status(400)
+      .json({ error: `Submission from ${fetchedState} is not allowed` });
     return;
   }
 
@@ -26,7 +36,7 @@ export const postSighting = async (req: Request, res: Response) => {
       `INSERT INTO sightings (submitted_by, observed_at, latitude, longitude, 
       village_or_ghat, district, block, state, water_body_condition, weather_condition,
        water_body, threats, fishing_gears, images, notes, submission_context) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`,
       [
         id,
         body.observedAt,

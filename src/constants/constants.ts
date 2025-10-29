@@ -38,3 +38,5 @@ export const LIVE_REPORTING = "LIVE_REPORTING",
 export const geocodingApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?key=${config.geocoding.geocodeKey}`;
 
 export const reverseGeocodingApiUrl = `https://apis.mappls.com/advancedmaps/v1/${config.geocoding.reverseGeocodeKey}/rev_geocode`;
+
+export const ALLOWED_STATES = ["WEST_BENGAL"];

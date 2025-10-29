@@ -3,7 +3,12 @@ import { Request, Response } from "express";
 import { redisClient } from "@/config/redis";
 import { DistrictBlocks } from "@/controllers/question/types";
 import { getStaticLookup } from "@/utils/static-lookup";
-import { geocodingApiUrl, reverseGeocodingApiUrl } from "@/constants/constants";
+import {
+  geocodingApiUrl,
+  reverseGeocodingApiUrl,
+  ALLOWED_STATES,
+} from "@/constants/constants";
+import { normalizeStateName } from "@/utils/strings";
 import { buildReverseGeocodeResult } from "@/controllers/region/helpers";
 
 export const getDistricts = async (
@@ -79,9 +84,18 @@ export const getGeocode = async (
       return;
     }
 
+    const state = response.data.results[0]?.address_components?.find(
+      (component: { types: string[] }) =>
+        component.types.includes("administrative_area_level_1"),
+    )?.long_name;
+
     res.status(200).json({
       message: "Location fetched successfully",
-      result: response.data.results[0]?.geometry?.location || null,
+      result: {
+        lat: response.data.results[0]?.geometry?.location?.lat || null,
+        lng: response.data.results[0]?.geometry?.location?.lng || null,
+        state: state || null,
+      },
     });
   } catch (error) {
     console.error("Error fetching reverse geocode:", error);
@@ -113,6 +127,16 @@ export const getReverseGeocode = async (
 
     if (cachedData) {
       const parsedCachedData = JSON.parse(cachedData);
+      const fetchedState = parsedCachedData.state;
+      if (
+        !ALLOWED_STATES.includes(normalizeStateName(parsedCachedData?.state))
+      ) {
+        res
+          .status(500)
+          .json({ error: `Submission from ${fetchedState} is not allowed` });
+        return;
+      }
+
       const result = buildReverseGeocodeResult(parsedCachedData, districtsData);
       res
         .status(200)
@@ -141,6 +165,17 @@ export const getReverseGeocode = async (
     );
 
     const result = buildReverseGeocodeResult(geocodeData, districtsData);
+
+    if (
+      result?.state &&
+      !ALLOWED_STATES.includes(normalizeStateName(result.state))
+    ) {
+      const fetchedState = result.state;
+      res
+        .status(500)
+        .json({ error: `Submission from ${fetchedState} is not allowed` });
+      return;
+    }
 
     res.status(200).json({
       message: "Location fetched successfully",
