@@ -53,6 +53,7 @@ export interface SightingReqBody {
   villageOrGhat?: string;
   district?: string;
   block?: string;
+  state?: string;
   waterBodyCondition: string;
   weatherCondition: string;
   waterBody: string;

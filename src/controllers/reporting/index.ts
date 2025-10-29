@@ -25,7 +25,7 @@ export const postReporting = async (req: Request, res: Response) => {
     const reportingQuery = await client.query(
       `INSERT INTO reportings (
         submitted_by, observed_at, latitude, longitude,
-        village_or_ghat, district, block, images, notes,
+        village_or_ghat, district, block, state, images, notes,
         submission_context
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING id`,
@@ -37,6 +37,7 @@ export const postReporting = async (req: Request, res: Response) => {
         body.villageOrGhat,
         body.district,
         body.block,
+        body.state,
         body.images || [],
         body.notes,
         type,

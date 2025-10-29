@@ -42,6 +42,7 @@ export const postSightingSchema = Joi.object({
   }),
   district: Joi.string().optional(),
   block: Joi.string().optional(),
+  state: Joi.string().optional(),
   villageOrGhat: Joi.string().optional(),
   fishingGears: Joi.array().items(Joi.string()).optional(),
   images: Joi.array().items(Joi.string()).optional(),

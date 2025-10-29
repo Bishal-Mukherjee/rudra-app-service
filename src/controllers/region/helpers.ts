@@ -6,6 +6,7 @@ export const buildReverseGeocodeResult = (
     district?: string;
     subDistrict?: string;
     formatted_address?: string;
+	state?: string;
   } | null,
   districtsData: any[],
 ) => {
@@ -24,5 +25,6 @@ export const buildReverseGeocodeResult = (
     block,
     district,
     formattedAddress: geocodeData?.formatted_address || null,
+	state: geocodeData?.state || null,
   };
 };

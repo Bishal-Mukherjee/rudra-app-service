@@ -27,6 +27,7 @@ export const postReportingSchema = Joi.object({
   district: Joi.string().optional(),
   block: Joi.string().optional(),
   villageOrGhat: Joi.string().optional(),
+  state: Joi.string().optional(),
   images: Joi.array().items(Joi.string()).optional(),
   notes: Joi.string().optional(),
 });
