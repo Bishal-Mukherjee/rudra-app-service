@@ -89,6 +89,13 @@ export const getGeocode = async (
         component.types.includes("administrative_area_level_1"),
     )?.long_name;
 
+    if (state && !ALLOWED_STATES.includes(normalizeStateName(state))) {
+      res
+        .status(500)
+        .json({ error: `Submission from ${state} is not allowed` });
+      return;
+    }
+
     res.status(200).json({
       message: "Location fetched successfully",
       result: {
