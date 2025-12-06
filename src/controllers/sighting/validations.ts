@@ -59,6 +59,3 @@ export const postSightingSchema = Joi.object({
   images: Joi.array().items(Joi.string()).optional(),
   notes: Joi.string().optional(),
 });
-
-// weatherWindyOrStormy -> hasWindyOrStormyWeather
-// waterBodyChannelType -> channelType
