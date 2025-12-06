@@ -8,6 +8,7 @@ export interface SpeciesCause {
     };
     value: string;
     image: string;
+    consequences: Array<string>;
   }>;
 }
 
