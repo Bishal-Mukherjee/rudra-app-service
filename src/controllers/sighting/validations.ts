@@ -32,6 +32,14 @@ export const postSightingSchema = Joi.object({
     "string.base": "Weather condition must be a string",
     "any.required": "Weather condition is a required field",
   }),
+  hasWindyOrStormyWeather: Joi.string().required().messages({
+    "string.base": "hasWindyOrStormyWeather must be a string",
+    "any.required": "hasWindyOrStormyWeather is a required field",
+  }),
+  channelType: Joi.string().required().messages({
+    "string.base": "Water body channel type must be a string",
+    "any.required": "Water body channel type is a required field",
+  }),
   waterBody: Joi.string().required().messages({
     "string.base": "Water body must be a string",
     "any.required": "Water body is a required field",
@@ -51,3 +59,6 @@ export const postSightingSchema = Joi.object({
   images: Joi.array().items(Joi.string()).optional(),
   notes: Joi.string().optional(),
 });
+
+// weatherWindyOrStormy -> hasWindyOrStormyWeather
+// waterBodyChannelType -> channelType

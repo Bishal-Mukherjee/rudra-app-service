@@ -54,6 +54,8 @@ export interface SightingReqBody {
   district?: string;
   block?: string;
   state?: string;
+  hasWindyOrStormyWeather: string;
+  channelType: string;
   waterBodyCondition: string;
   weatherCondition: string;
   waterBody: string;

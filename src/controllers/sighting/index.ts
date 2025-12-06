@@ -4,6 +4,7 @@ import { Sighting, SightingReqBody } from "@/controllers/sighting/types";
 import { postSightingSchema } from "@/controllers/sighting/validations";
 import { ALLOWED_STATES } from "@/constants/constants";
 import { normalizeStateName } from "@/utils/strings";
+import { prepareSightingData } from "@/controllers/sighting/helpers";
 
 export const postSighting = async (req: Request, res: Response) => {
   const { error } = postSightingSchema.validate(req.body);
@@ -30,12 +31,14 @@ export const postSighting = async (req: Request, res: Response) => {
     const { type } = req.params;
     const body = req.body as SightingReqBody;
 
+    const { weatherCondition, waterBody } = prepareSightingData(body);
+
     await client.query("BEGIN");
 
     const query = await client.query(
-      `INSERT INTO sightings (submitted_by, observed_at, latitude, longitude, 
+      `INSERT INTO sightings (submitted_by, observed_at, latitude, longitude,
       village_or_ghat, district, block, state, water_body_condition, weather_condition,
-       water_body, threats, fishing_gears, images, notes, submission_context) 
+       water_body, threats, fishing_gears, images, notes, submission_context)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`,
       [
         id,
@@ -47,8 +50,8 @@ export const postSighting = async (req: Request, res: Response) => {
         body.block,
         body.state,
         body.waterBodyCondition,
-        body.weatherCondition,
-        body.waterBody,
+        weatherCondition,
+        waterBody,
         body.threats,
         body.fishingGears || [],
         body.images || [],

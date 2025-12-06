@@ -8,7 +8,7 @@ import {
   DataObject,
   FormattedQuestion,
 } from "@/controllers/question/types";
-import { speciesAgeGroups } from "@/constants/constants";
+import { speciesAgeGroups, confirmationOptions } from "@/constants/constants";
 import { getStaticLookup } from "@/utils/static-lookup";
 
 export const getAllQuestions = async (
@@ -43,6 +43,7 @@ export const getAllQuestions = async (
     const [
       threatsData,
       fishingGearsData,
+      channelTypesData,
       waterBodiesData,
       waterBodyConditionData,
       weatherConditionData,
@@ -50,6 +51,7 @@ export const getAllQuestions = async (
     ] = await Promise.all([
       getStaticLookup("disturbances"),
       getStaticLookup("fishing_gears"),
+      getStaticLookup("channel_types"),
       getStaticLookup("water_bodies"),
       getStaticLookup("water_body_conditions"),
       getStaticLookup("weather_conditions"),
@@ -65,6 +67,8 @@ export const getAllQuestions = async (
       water_bodies: waterBodiesData,
       water_body_conditions: waterBodyConditionData,
       weather_conditions: weatherConditionData,
+      yes_no: confirmationOptions,
+      channel_types: channelTypesData,
     };
 
     const appendOptions = (
