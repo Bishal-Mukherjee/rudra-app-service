@@ -22,6 +22,7 @@ export const getNotifications = async (
 	    id,
         title,
         content,
+		external_url AS "externalUrl",
         created_at AS "createdAt"
       FROM notifications
       WHERE recipient_role = $1

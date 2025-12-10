@@ -14,7 +14,8 @@ export const getSpecies = async (req: Request, res: Response) => {
           json_build_object(
             'label', json_build_object('en', label_en, 'bn', label_bn),
             'value', value,
-            'image', image,
+			'adultMaleImage', adult_male_image,
+			'adultFemaleImage', adult_female_image,
 			'subAdultImage', sub_adult_image,
             'ageGroup', age_group,
             'lastUpdatedAt', last_updated_at
