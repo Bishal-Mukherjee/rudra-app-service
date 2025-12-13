@@ -5,9 +5,11 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import swaggerUi from "swagger-ui-express";
 import { pool } from "@/config/db";
 import { redisClient } from "@/config/redis";
 import { config } from "@/config/config";
+import { swaggerSpec } from "@/config/swagger";
 import { rateLimiter } from "@/utils/rate-limit";
 import { router as apiRoutes } from "@/routes";
 import { errorHandler } from "@/middlewares/error-handler";
@@ -59,6 +61,17 @@ redisClient
 app.get("/", (req, res) => {
   res.send(" 🚀 SERVER WORKING ");
 });
+
+// Swagger Documentation
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "Aqua Observer API Documentation",
+    customfavIcon: "/favicon.ico",
+  }),
+);
 
 app.use("/api/v1", apiRoutes);
 
