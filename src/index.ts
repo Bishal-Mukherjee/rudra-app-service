@@ -68,7 +68,7 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec, {
     customCss: ".swagger-ui .topbar { display: none }",
-    customSiteTitle: "Aqua Observer API Documentation",
+    customSiteTitle: "RUDRA App Service API Documentation",
     customfavIcon: "/favicon.ico",
   }),
 );
