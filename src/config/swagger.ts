@@ -5,7 +5,7 @@ const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
     title: "RUDRA App Service",
-    version: "1.0.0",
+    version: "1.0.1",
     description:
       "API documentation for RUDRA App Service - A platform for tracking and reporting marine life sightings",
   },
@@ -175,7 +175,12 @@ const swaggerDefinition = {
 const options: swaggerJsdoc.Options = {
   swaggerDefinition,
   // Path to the API routes files
-  apis: ["./src/routes/**/*.ts", "./src/controllers/**/*.ts"],
+  apis: [
+    "./src/routes/**/*.ts",
+    "./src/controllers/**/*.ts",
+    "./src/routes/**/*.js",
+    "./src/controllers/**/*.js",
+  ],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
