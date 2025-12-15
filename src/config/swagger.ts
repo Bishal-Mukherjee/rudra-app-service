@@ -12,11 +12,11 @@ const swaggerDefinition = {
   servers: [
     {
       url: `http://localhost:${config.port}/api/v1`,
-      description: "Development server",
+      description: "Local server",
     },
     {
-      url: "https://api.rudraapp.com/api/v1",
-      description: "Production server",
+      url: "https://dev.app.rudratracker.org/api/v1",
+      description: "Development server",
     },
   ],
   components: {
@@ -126,48 +126,48 @@ const swaggerDefinition = {
       description: "Authentication endpoints",
     },
     {
-      name: "User",
-      description: "User management endpoints",
-    },
-    {
-      name: "Species",
-      description: "Species information endpoints",
-    },
-    {
-      name: "Region",
-      description: "Region management endpoints",
-    },
-    {
-      name: "Sighting",
-      description: "Sighting reporting and management endpoints",
-    },
-    {
-      name: "Question",
-      description: "Question management endpoints",
-    },
-    {
-      name: "Tier",
-      description: "Tier management endpoints",
-    },
-    {
       name: "Module",
       description: "Module management endpoints",
-    },
-    {
-      name: "Reporting",
-      description: "Reporting endpoints",
-    },
-    {
-      name: "Submission",
-      description: "Submission management endpoints",
     },
     {
       name: "Notification",
       description: "Notification endpoints",
     },
     {
+      name: "Question",
+      description: "Question management endpoints",
+    },
+    {
+      name: "Region",
+      description: "Region management endpoints",
+    },
+    {
+      name: "Reporting",
+      description: "Reporting endpoints",
+    },
+    {
       name: "Resource",
       description: "Resource management endpoints",
+    },
+    {
+      name: "Sighting",
+      description: "Sighting reporting and management endpoints",
+    },
+    {
+      name: "Species",
+      description: "Species information endpoints",
+    },
+    {
+      name: "Submission",
+      description: "Submission management endpoints",
+    },
+    {
+      name: "Tier",
+      description: "Tier management endpoints",
+    },
+    {
+      name: "User",
+      description: "User management endpoints",
     },
   ],
 };
@@ -175,12 +175,7 @@ const swaggerDefinition = {
 const options: swaggerJsdoc.Options = {
   swaggerDefinition,
   // Path to the API routes files
-  apis: [
-    "./src/routes/**/*.ts",
-    "./src/controllers/**/*.ts",
-    "./src/routes/**/*.js",
-    "./src/controllers/**/*.js",
-  ],
+  apis: ["./src/routes/**/*.ts", "./src/controllers/**/*.ts"],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
