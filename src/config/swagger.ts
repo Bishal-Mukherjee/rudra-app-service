@@ -6,7 +6,7 @@ const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
     title: "RUDRA App Service",
-    version: "1.0.2",
+    version: "1.0.0",
     description:
       "API documentation for RUDRA App Service - A platform for tracking and reporting marine life sightings",
   },
