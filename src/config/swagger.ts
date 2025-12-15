@@ -1,11 +1,12 @@
 import swaggerJsdoc from "swagger-jsdoc";
+import path from "path";
 import { config } from "@/config/config";
 
 const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
     title: "RUDRA App Service",
-    version: "1.0.1",
+    version: "1.0.2",
     description:
       "API documentation for RUDRA App Service - A platform for tracking and reporting marine life sightings",
   },
@@ -176,10 +177,10 @@ const options: swaggerJsdoc.Options = {
   swaggerDefinition,
   // Path to the API routes files
   apis: [
-    "./src/routes/**/*.ts",
-    "./src/controllers/**/*.ts",
-    "./src/routes/**/*.js",
-    "./src/controllers/**/*.js",
+    path.join(__dirname, "../routes/**/*.ts"),
+    path.join(__dirname, "../controllers/**/*.ts"),
+    path.join(__dirname, "../routes/**/*.js"),
+    path.join(__dirname, "../controllers/**/*.js"),
   ],
 };
 
