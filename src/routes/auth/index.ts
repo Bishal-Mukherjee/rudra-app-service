@@ -138,10 +138,6 @@ router.post("/signin", signin);
  *                 type: string
  *                 description: User's occupation (optional)
  *                 example: Marine Biologist
- *               expiresIn:
- *                 type: string
- *                 description: Token expiration time in minutes (optional, defaults to 7 days)
- *                 example: "10080"
  *     responses:
  *       201:
  *         description: User signed up successfully
