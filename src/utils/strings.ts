@@ -4,7 +4,7 @@ export const findBestMatch = (input: string, options: any[]) => {
   const fuse = new Fuse(options, { keys: ["label.en"], includeScore: true });
   const [best] = fuse.search(input);
 
-  if (!best.score) {
+  if (!best?.score) {
     return { value: null, label: null, percentage: 0 };
   }
 
@@ -14,3 +14,6 @@ export const findBestMatch = (input: string, options: any[]) => {
     percentage: parseFloat(((1 - best.score) * 100).toFixed(2)),
   };
 };
+
+export const normalizeStateName = (state: string) =>
+  state.trim().toUpperCase().replace(/\s+/g, "_");

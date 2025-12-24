@@ -69,6 +69,7 @@ export interface ReportingReqBody {
   villageOrGhat: string;
   district: string;
   block: string;
+  state: string;
   images?: string[];
   species?: SpeciesData[];
   notes?: string;

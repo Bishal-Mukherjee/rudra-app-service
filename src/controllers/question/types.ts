@@ -43,6 +43,8 @@ export interface DataObject {
   water_bodies: LabelOption[] | null;
   water_body_conditions: LabelOption[] | null;
   weather_conditions: LabelOption[] | null;
+  yes_no: LabelOption[] | null;
+  channel_types: LabelOption[] | null;
 }
 
 export interface FormattedQuestion {

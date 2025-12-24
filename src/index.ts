@@ -5,9 +5,11 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import swaggerUi from "swagger-ui-express";
 import { pool } from "@/config/db";
 import { redisClient } from "@/config/redis";
 import { config } from "@/config/config";
+import { swaggerSpec } from "@/config/swagger";
 import { rateLimiter } from "@/utils/rate-limit";
 import { router as apiRoutes } from "@/routes";
 import { errorHandler } from "@/middlewares/error-handler";
@@ -42,14 +44,14 @@ pool.connect((err) => {
     console.error("Error connecting to Database", err.message);
     process.exit(1);
   } else {
-    console.info("✅ Connected to database");
+    console.info("🔹 Connected to database");
   }
 });
 
 // Redis Connection
 redisClient
   .connect()
-  .then(() => console.log("✅ Connected to redis"))
+  .then(() => console.log("🔹 Connected to redis"))
   .catch((err: Error) => {
     console.log("Error connecting to Redis");
     console.log(err);
@@ -59,6 +61,17 @@ redisClient
 app.get("/", (req, res) => {
   res.send(" 🚀 SERVER WORKING ");
 });
+
+// Swagger Documentation
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "RUDRA App Service API Documentation",
+    customfavIcon: "/favicon.ico",
+  }),
+);
 
 app.use("/api/v1", apiRoutes);
 
@@ -75,5 +88,9 @@ app.use(errorHandler);
 const port = config.port;
 
 app.listen(port, () => {
-  console.log(`🚀 Server on port ${port}`);
+  console.info(
+    `🚀 Server started
+🔸 Environment : ${process.env.NODE_ENV}
+🔹 Listening on : http://localhost:${port}`,
+  );
 });

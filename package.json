@@ -6,6 +6,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
+    "dev:development": "cross-env NODE_ENV=development nodemon",
+    "dev:staging": "cross-env NODE_ENV=staging nodemon",
     "start:dist": "node dist/index.js",
     "lint": "eslint --fix src test",
     "typecheck": "tsc --noEmit"
@@ -19,6 +21,9 @@
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.0.7",
     "@types/pg": "^8.15.4",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "cross-env": "^10.1.0",
     "eslint": "^9.30.0",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
@@ -43,6 +48,8 @@
     "multer": "^2.0.2",
     "nanoid": "^3.3.4",
     "pg": "^8.16.3",
-    "redis": "^5.6.0"
+    "redis": "^5.6.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }

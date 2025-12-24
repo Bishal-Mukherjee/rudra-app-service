@@ -1,14 +1,9 @@
 import { Request, Response } from "express";
 import { pool } from "@/config/db";
-import { LIVE_REPORTING, UNKNOWN } from "@/constants/constants";
-import {
-  Reporting,
-  ReportingReqBody,
-  MatchResult,
-} from "@/controllers/reporting/types";
+import { Reporting, ReportingReqBody } from "@/controllers/reporting/types";
 import { postReportingSchema } from "@/controllers/reporting/validations";
-import { findBestMatch } from "@/utils/strings";
-import { getStaticLookup } from "@/utils/static-lookup";
+import { ALLOWED_STATES } from "@/constants/constants";
+import { normalizeStateName } from "@/utils/strings";
 
 export const postReporting = async (req: Request, res: Response) => {
   const { error } = postReportingSchema.validate(req.body);
@@ -20,6 +15,14 @@ export const postReporting = async (req: Request, res: Response) => {
     return;
   }
 
+  if (!ALLOWED_STATES.includes(normalizeStateName(req.body.state))) {
+    const fetchedState = req.body.state;
+    res
+      .status(400)
+      .json({ error: `Submission from ${fetchedState} is not allowed` });
+    return;
+  }
+
   const client = await pool.connect();
 
   try {
@@ -27,38 +30,14 @@ export const postReporting = async (req: Request, res: Response) => {
     const { type } = req.params;
     const body = req.body as ReportingReqBody;
 
-    const districtInUpperCase = String(body.district).toUpperCase();
-    const blockInUpperCase = String(body.block).toUpperCase();
-
-    let m: string | MatchResult = districtInUpperCase || UNKNOWN;
-    let b: string | MatchResult = blockInUpperCase || UNKNOWN;
-
-    if (type === LIVE_REPORTING && m !== UNKNOWN && b !== UNKNOWN) {
-      const [districtsData, blocksData] = (await Promise.all([
-        getStaticLookup("districts"),
-        getStaticLookup("blocks"),
-      ])) as [any[], Record<string, any[]>];
-
-      const matchedDistrict = await Promise.resolve(
-        findBestMatch(m as string, districtsData),
-      );
-
-      const matchedBlock = await Promise.resolve(
-        findBestMatch(b as string, blocksData[matchedDistrict.value] || []),
-      );
-
-      m = matchedDistrict.percentage > 20 ? matchedDistrict.value : UNKNOWN;
-      b = matchedBlock.percentage > 20 ? matchedBlock.value : UNKNOWN;
-    }
-
     await client.query("BEGIN");
 
     const reportingQuery = await client.query(
       `INSERT INTO reportings (
         submitted_by, observed_at, latitude, longitude,
-        village_or_ghat, district, block, images, notes,
+        village_or_ghat, district, block, state, images, notes,
         submission_context
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING id`,
       [
         id,
@@ -66,8 +45,9 @@ export const postReporting = async (req: Request, res: Response) => {
         body.latitude,
         body.longitude,
         body.villageOrGhat,
-        m,
-        b,
+        body.district,
+        body.block,
+        body.state,
         body.images || [],
         body.notes,
         type,
@@ -232,106 +212,6 @@ export const getAllReportings = async (req: Request, res: Response) => {
         };
       },
     );
-
-    res.status(200).json({
-      message: "Reportings fetched successfully",
-      result: reportings || [],
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-export const getReportingsByType = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.user;
-    const { type } = req.params;
-
-    const speciesQuery = await pool.query(
-      "SELECT value, age_group FROM species",
-    );
-    const speciesMap = new Map();
-
-    speciesQuery.rows.forEach(
-      (species: { value: string; age_group: string }) => {
-        speciesMap.set(species.value, species.age_group);
-      },
-    );
-
-    const query = await pool.query(
-      `SELECT json_agg(sighting_row) AS result
-       FROM (
-          SELECT 
-            s.id,
-            s.observed_at AS "observedAt",
-            s.latitude,
-            s.longitude,
-            s.district,
-            s.block,
-            s.village_or_ghat AS "villageOrGhat",
-            (SELECT json_agg(
-                json_build_object(
-                  'type', sp.species,
-					'adult', json_build_object(
-						'stranded', sp.adult_stranded,
-						'injured', sp.adult_injured,
-						'dead', sp.adult_dead
-					),
-					'adultMale', json_build_object(
-                    'stranded', sp.adult_male_stranded,
-                    'injured', sp.adult_male_injured,
-                    'dead', sp.adult_male_dead
-                  ),
-                      'adultFemale', json_build_object(
-                    'stranded', sp.adult_female_stranded,
-                    'injured', sp.adult_female_injured,
-                    'dead', sp.adult_female_dead
-                 ),
-                      'subAdult', json_build_object(
-                    'stranded', sp.sub_adult_stranded,
-                    'injured', sp.sub_adult_injured,
-                    'dead', sp.sub_adult_dead
-                  )
-            )) FROM reporting_species sp
-              WHERE sp.reporting_id = s.id
-            ) AS species,
-            s.images,
-			s.submitted_at AS "submittedAt",
-            json_build_object(
-              'name', u.name,
-              'phoneNumber', u.phone_number
-            ) AS "submittedBy"
-          FROM reportings s 
-          JOIN users u ON s.submitted_by = u.id
-          WHERE s.submitted_by = $1 AND s.submission_context = $2
-          ORDER BY s.submitted_at DESC
-        ) AS sighting_row;`,
-      [id, type],
-    );
-
-    const reportings = query.rows[0]?.result?.map((reporting: Reporting) => {
-      const reportingSpecies = reporting.species.map((spec) => {
-        if (speciesMap.get(spec.type) === "duo") {
-          return {
-            type: spec.type,
-            adult: spec.adult || 0,
-            subAdult: spec.subAdult || 0,
-          };
-        }
-        return {
-          type: spec.type,
-          adultMale: spec.adultMale || 0,
-          adultFemale: spec.adultFemale || 0,
-          subAdult: spec.subAdult || 0,
-        };
-      });
-
-      return {
-        ...reporting,
-        species: reportingSpecies,
-      };
-    });
 
     res.status(200).json({
       message: "Reportings fetched successfully",

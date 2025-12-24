@@ -25,7 +25,6 @@ export const signup = async (
       gender?: string;
       age?: number;
       occupation?: string;
-      expiresIn?: string;
     }
   >,
   res: Response<{
@@ -48,8 +47,7 @@ export const signup = async (
       return;
     }
 
-    const { name, phoneNumber, email, gender, age, occupation, expiresIn } =
-      req.body;
+    const { name, phoneNumber, email, gender, age, occupation } = req.body;
 
     const query = await pool.query(
       "SELECT * FROM users WHERE phone_number = $1",
@@ -94,11 +92,10 @@ export const signup = async (
     const refreshToken = crypto.randomBytes(32).toString("hex");
     const refreshTokenHash = await hash(refreshToken, 10);
 
-    // Calculate expiration time - if expiresIn is a number, use minutes, otherwise default to 7 days
-    const expiresInMinutes = !isNaN(Number(expiresIn))
-      ? Number(expiresIn)
-      : 7 * 24 * 60;
-    const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
+    const refreshExpiresInMinutes = 7 * 24 * 60;
+    const expiresAt = new Date(
+      Date.now() + refreshExpiresInMinutes * 60 * 1000,
+    );
 
     await pool.query(
       "INSERT INTO refresh_tokens (user_id, token_hash, expires_at, created_at) VALUES ($1, $2, $3, NOW())",

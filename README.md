@@ -145,4 +145,8 @@ This is the backend service that powers the mobile app used by volunteers to rep
   - Species, Region, Tier, Module, Notifications
   - File uploads (Supabase Storage)
 
+### 📚 API Documentation (Swagger)
+
+- **Swagger UI**: `http://localhost:8080/api-docs`
+
 ---

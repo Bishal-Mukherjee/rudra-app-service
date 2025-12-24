@@ -3,7 +3,13 @@ import { Request, Response } from "express";
 import { redisClient } from "@/config/redis";
 import { DistrictBlocks } from "@/controllers/question/types";
 import { getStaticLookup } from "@/utils/static-lookup";
-import { geocodingApiUrl, reverseGeocodingApiUrl } from "@/constants/constants";
+import {
+  geocodingApiUrl,
+  reverseGeocodingApiUrl,
+  ALLOWED_STATES,
+} from "@/constants/constants";
+import { normalizeStateName } from "@/utils/strings";
+import { buildReverseGeocodeResult } from "@/controllers/region/helpers";
 
 export const getDistricts = async (
   req: Request,
@@ -78,9 +84,25 @@ export const getGeocode = async (
       return;
     }
 
+    const state = response.data.results[0]?.address_components?.find(
+      (component: { types: string[] }) =>
+        component.types.includes("administrative_area_level_1"),
+    )?.long_name;
+
+    if (state && !ALLOWED_STATES.includes(normalizeStateName(state))) {
+      res
+        .status(500)
+        .json({ error: `Submission from ${state} is not allowed` });
+      return;
+    }
+
     res.status(200).json({
       message: "Location fetched successfully",
-      result: response.data.results[0]?.geometry?.location || null,
+      result: {
+        lat: response.data.results[0]?.geometry?.location?.lat || null,
+        lng: response.data.results[0]?.geometry?.location?.lng || null,
+        state: state || null,
+      },
     });
   } catch (error) {
     console.error("Error fetching reverse geocode:", error);
@@ -101,23 +123,35 @@ export const getReverseGeocode = async (
     }
 
     // TODO: Confirm if rounding is acceptable for the application
-    const roundedLat = Number(lat).toFixed(3) as string;
-    const roundedLng = Number(lng).toFixed(3) as string;
+    const roundedLat = Number(lat).toFixed(3);
+    const roundedLng = Number(lng).toFixed(3);
+    const cacheKey = `reverse_geocode:${roundedLat},${roundedLng}`;
 
-    const cachedData = await redisClient.get(
-      `reverse_geocode:${roundedLat},${roundedLng}`,
-    );
+    const [districtsData, cachedData] = await Promise.all([
+      getStaticLookup("districts"),
+      redisClient.get(cacheKey),
+    ]);
 
     if (cachedData) {
-      res.status(200).json({
-        message: "Location fetched successfully",
-        result: JSON.parse(cachedData),
-      });
+      const parsedCachedData = JSON.parse(cachedData);
+      const fetchedState = parsedCachedData.state;
+      if (
+        !ALLOWED_STATES.includes(normalizeStateName(parsedCachedData?.state))
+      ) {
+        res
+          .status(500)
+          .json({ error: `Submission from ${fetchedState} is not allowed` });
+        return;
+      }
+
+      const result = buildReverseGeocodeResult(parsedCachedData, districtsData);
+      res
+        .status(200)
+        .json({ message: "Location fetched successfully", result });
       return;
     }
 
     const apiUrl = new URL(reverseGeocodingApiUrl);
-
     apiUrl.searchParams.append("lat", lat as string);
     apiUrl.searchParams.append("lng", lng as string);
     apiUrl.searchParams.append("region", "ind");
@@ -129,15 +163,30 @@ export const getReverseGeocode = async (
       return;
     }
 
-    await redisClient.set(
-      `reverse_geocode:${roundedLat},${roundedLng}`,
-      JSON.stringify(response.data.results[0]),
-      { EX: 259200 }, // 72 hours
+    const geocodeData = response.data.results[0];
+
+    redisClient.set(
+      cacheKey,
+      JSON.stringify(geocodeData),
+      { EX: 345600 }, // 96 hours
     );
+
+    const result = buildReverseGeocodeResult(geocodeData, districtsData);
+
+    if (
+      result?.state &&
+      !ALLOWED_STATES.includes(normalizeStateName(result.state))
+    ) {
+      const fetchedState = result.state;
+      res
+        .status(500)
+        .json({ error: `Submission from ${fetchedState} is not allowed` });
+      return;
+    }
 
     res.status(200).json({
       message: "Location fetched successfully",
-      result: response.data.results[0],
+      result,
     });
   } catch (error) {
     console.error("Error fetching reverse geocode:", error);
