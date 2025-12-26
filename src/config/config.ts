@@ -34,6 +34,17 @@ interface Config {
     lookupBucket: string;
     secretKey: string;
   };
+  gcp: {
+    projectId: string;
+    credentials: {
+      type: string;
+      projectId: string;
+      privateKeyId: string;
+      privateKey: string | undefined;
+      clientEmail: string;
+      clientId: string;
+    };
+  };
   geocoding: {
     geocodeKey: string;
     reverseGeocodeKey: string;
@@ -122,6 +133,30 @@ const geocodingConfig = () => {
   };
 };
 
+const gcpConfig = () => {
+  if (
+    !process.env.GCP_PROJECT_ID ||
+    !process.env.GCP_PRIVATE_KEY_ID ||
+    !process.env.GCP_PRIVATE_KEY ||
+    !process.env.GCP_CLIENT_EMAIL ||
+    !process.env.GCP_CLIENT_ID
+  ) {
+    throw new Error("Missing GCP configuration");
+  }
+
+  return {
+    projectId: process.env.GCP_PROJECT_ID,
+    credentials: {
+      type: "service_account",
+      projectId: process.env.GCP_PROJECT_ID || "",
+      privateKeyId: process.env.GCP_PRIVATE_KEY_ID || "",
+      privateKey: process.env.GCP_PRIVATE_KEY,
+      clientEmail: process.env.GCP_CLIENT_EMAIL || "",
+      clientId: process.env.GCP_CLIENT_ID || "",
+    },
+  };
+};
+
 export const config: Config = {
   port: Number(process.env.SERVER_PORT) || 8080,
   jwtSecret: process.env.JWT_SECRET || "secret",
@@ -129,5 +164,6 @@ export const config: Config = {
   redis: redisConfig(),
   twilio: twilioConfig(),
   supabase: supabaseConfig(),
+  gcp: gcpConfig(),
   geocoding: geocodingConfig(),
 };
