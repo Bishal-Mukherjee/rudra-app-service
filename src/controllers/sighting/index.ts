@@ -71,12 +71,12 @@ export const postSighting = async (req: Request, res: Response) => {
     if (species.length > 0) {
       await Promise.all(
         species.map(async (spec) => {
-          const { adult, adultMale, adultFemale, subAdult } =
+          const { adult, adultMale, adultFemale, subAdult, unidentified } =
             spec.ageGroup || {};
 
           return client.query(
-            `INSERT INTO sighting_species (sighting_id, species, adult, sub_adult, adult_male, adult_female) 
-             VALUES ($1, $2, $3, $4, $5, $6)`,
+            `INSERT INTO sighting_species (sighting_id, species, adult, sub_adult, adult_male, adult_female, unidentified) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
             [
               sightingId,
               spec.type,
@@ -84,6 +84,7 @@ export const postSighting = async (req: Request, res: Response) => {
               subAdult || 0,
               adultMale || 0,
               adultFemale || 0,
+              unidentified || 0,
             ],
           );
         }),
