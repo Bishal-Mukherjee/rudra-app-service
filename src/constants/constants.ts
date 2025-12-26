@@ -10,10 +10,6 @@ export const speciesAgeGroups = {
       label: { en: "Calves", bn: "Calves" },
       value: "subAdult",
     },
-    // {
-    //   label: { en: "Unidentified", bn: "Unidentified" },
-    //   value: "unidentified",
-    // },
   ],
   trio: [
     {
@@ -27,10 +23,6 @@ export const speciesAgeGroups = {
     {
       label: { en: "Sub-Adults/Juveniles", bn: "Sub-Adults/Juveniles" },
       value: "subAdult",
-    },
-    {
-      label: { en: "Unidentified", bn: "Unidentified" },
-      value: "unidentified",
     },
   ],
 } as const;
