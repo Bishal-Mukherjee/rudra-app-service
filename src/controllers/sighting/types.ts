@@ -39,6 +39,7 @@ export interface AgeGroup {
   adultMale?: number;
   adultFemale?: number;
   subAdult?: number;
+  unidentified?: number;
 }
 
 export interface SpeciesData {
