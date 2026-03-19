@@ -85,6 +85,11 @@ jobs:
             -e SERVER_PORT=8080 \
             ${{ secrets.DOCKER_USERNAME }}/rudra-app-service:latest
 
+      - name: Clean up Docker
+        if: always()
+        run: |
+          docker system prune -af --volumes
+
   deploy-development:
     runs-on: [self-hosted, development]
     needs: build
@@ -127,3 +132,8 @@ jobs:
             -e REVERSE_GEOCODE_API_KEY=${{ secrets.DEV_REVERSE_GEOCODE_API_KEY }} \
             -e SERVER_PORT=8080 \
             ${{ secrets.DOCKER_USERNAME }}/rudra-app-service:dev
+
+      - name: Clean up Docker
+        if: always()
+        run: |
+          docker system prune -af --volumes
