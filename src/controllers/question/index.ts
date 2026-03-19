@@ -16,7 +16,8 @@ export const getAllQuestions = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const typeInUpperCase = req.params.type.toUpperCase();
+    const questionTypeParam = String(req.params.type);
+    const typeInUpperCase = questionTypeParam.toUpperCase();
 
     const allowedTypes = ["REPORTING", "SIGHTING"];
 
@@ -28,7 +29,7 @@ export const getAllQuestions = async (
     const questionType =
       typeInUpperCase.charAt(0) + typeInUpperCase.slice(1).toLowerCase();
 
-    const cachedKey = `question_set:${req.params.type.toLowerCase()}`;
+    const cachedKey = `question_set:${questionTypeParam.toLowerCase()}`;
     const cachedData = await redisClient.get(cachedKey);
 
     if (cachedData) {
