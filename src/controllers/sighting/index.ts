@@ -37,15 +37,16 @@ export const postSighting = async (req: Request, res: Response) => {
 
     const query = await client.query(
       `INSERT INTO sightings (submitted_by, observed_at, latitude, longitude,
-      village_or_ghat, district, block, state, water_body_condition, weather_condition,
+      village_or_ghat, landmark, district, block, state, water_body_condition, weather_condition,
        water_body, threats, fishing_gears, images, notes, submission_context)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id`,
       [
         id,
         body.observedAt,
         body.latitude,
         body.longitude,
         body.villageOrGhat,
+        body.landmark,
         body.district,
         body.block,
         body.state,
@@ -75,7 +76,7 @@ export const postSighting = async (req: Request, res: Response) => {
             spec.ageGroup || {};
 
           return client.query(
-            `INSERT INTO sighting_species (sighting_id, species, adult, sub_adult, adult_male, adult_female, unidentified) 
+            `INSERT INTO sighting_species (sighting_id, species, adult, sub_adult, adult_male, adult_female, unidentified)
              VALUES ($1, $2, $3, $4, $5, $6, $7)`,
             [
               sightingId,

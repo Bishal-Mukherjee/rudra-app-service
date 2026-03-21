@@ -55,6 +55,7 @@ export const postSightingSchema = Joi.object({
     "any.required": "State is a required field",
   }),
   villageOrGhat: Joi.string().optional(),
+  landmark: Joi.string().optional(),
   fishingGears: Joi.array().items(Joi.string()).optional(),
   images: Joi.array().items(Joi.string()).optional(),
   notes: Joi.string().optional(),
