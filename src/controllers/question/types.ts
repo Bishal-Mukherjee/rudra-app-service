@@ -32,6 +32,7 @@ export interface QuestionRow {
   option_key: OptionKey;
   type: string;
   is_optional: boolean;
+  mode: string;
   index: number;
   last_updated_at: string;
 }
@@ -54,4 +55,5 @@ export interface FormattedQuestion {
   options?: LabelOption[];
   type: string;
   isOptional: boolean;
+  mode: string;
 }

@@ -27,6 +27,7 @@ export const postReportingSchema = Joi.object({
   district: Joi.string().optional(),
   block: Joi.string().optional(),
   villageOrGhat: Joi.string().optional(),
+  landmark: Joi.string().optional(),
   state: Joi.string().required().messages({
     "string.base": "State must be a string",
     "any.required": "State is a required field",

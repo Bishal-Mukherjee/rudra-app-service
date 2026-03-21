@@ -6,6 +6,7 @@ export interface Reporting {
   district: string;
   block: string;
   villageOrGhat: string;
+  landmark?: string;
   species: Array<{
     type: string;
     adult: {
@@ -67,6 +68,7 @@ export interface ReportingReqBody {
   latitude: number;
   longitude: number;
   villageOrGhat: string;
+  landmark?: string;
   district: string;
   block: string;
   state: string;
