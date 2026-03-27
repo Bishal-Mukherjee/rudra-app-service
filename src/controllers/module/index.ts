@@ -34,6 +34,7 @@ export const getModules = async (
     const { rows: modulesQuery } = await pool.query(
       `SELECT json_agg (json_build_object(
          'id', id,
+		 'index', index,
          'title', json_build_object(
             'en', title_en,
             'bn', title_bn
@@ -50,6 +51,7 @@ export const getModules = async (
         'lastUpdatedAt', last_updated_at
        )) AS result FROM (
          SELECT * FROM modules WHERE tier = $1 AND is_active = true
+		 ORDER BY index ASC
          LIMIT $2 OFFSET $3
        ) AS paged_modules;`,
       [tier, limit, offset],
@@ -64,15 +66,11 @@ export const getModules = async (
       return;
     }
 
-    const sortedResults = modulesQuery[0].result.sort(
-      (a: { title: { en: string } }, b: { title: { en: string } }) => {
-        return a.title.en.localeCompare(b.title.en);
-      },
-    );
+    const fetchedModules = modulesQuery[0]?.result || [];
 
     res.status(200).json({
       message: "Modules fetched successfully",
-      result: sortedResults,
+      result: fetchedModules,
       pagination: {
         page,
         totalPages,
