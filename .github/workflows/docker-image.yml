@@ -46,6 +46,7 @@ jobs:
     runs-on: self-hosted
     needs: build
     if: github.ref == 'refs/heads/main'
+    environment: production
     steps:
       - name: Pull the Docker Image
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/rudra-app-service:latest
@@ -94,6 +95,7 @@ jobs:
     runs-on: [self-hosted, development]
     needs: build
     if: github.ref == 'refs/heads/dev'
+    environment: development
     steps:
       - name: Pull the Docker Image
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/rudra-app-service:dev
@@ -111,25 +113,25 @@ jobs:
             --name rudra-app-service-container \
             --restart unless-stopped \
             -e NODE_ENV=development \
-            -e DB_HOST=${{ secrets.DEV_DB_HOST }} \
-            -e DB_PORT=${{ secrets.DEV_DB_PORT }} \
-            -e DB_NAME=${{ secrets.DEV_DB_NAME }} \
-            -e DB_USER=${{ secrets.DEV_DB_USER }} \
-            -e DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }} \
-            -e JWT_SECRET=${{ secrets.DEV_JWT_SECRET }} \
-            -e REDIS_USERNAME=${{ secrets.DEV_REDIS_USERNAME }} \
-            -e REDIS_PASSWORD=${{ secrets.DEV_REDIS_PASSWORD }} \
-            -e REDIS_HOST=${{ secrets.DEV_REDIS_HOST }} \
-            -e REDIS_PORT=${{ secrets.DEV_REDIS_PORT }} \
+            -e DB_HOST=${{ secrets.DB_HOST }} \
+            -e DB_PORT=${{ secrets.DB_PORT }} \
+            -e DB_NAME=${{ secrets.DB_NAME }} \
+            -e DB_USER=${{ secrets.DB_USER }} \
+            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e REDIS_USERNAME=${{ secrets.REDIS_USERNAME }} \
+            -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
+            -e REDIS_HOST=${{ secrets.REDIS_HOST }} \
+            -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
             -e TWILIO_SERVICE_SID=${{ secrets.TWILIO_SERVICE_SID }} \
             -e TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }} \
             -e TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }} \
             -e TWILIO_APP_HASH=${{ secrets.TWILIO_APP_HASH }} \
-            -e SUPABASE_URL=${{ secrets.DEV_SUPABASE_URL }} \
-            -e SUPABASE_LOOKUP_BUCKET=${{ secrets.DEV_SUPABASE_LOOKUP_BUCKET }} \
-            -e SUPABASE_SECRET_KEY=${{ secrets.DEV_SUPABASE_SECRET_KEY }} \
-            -e GEOCODE_API_KEY=${{ secrets.DEV_GEOCODE_API_KEY }} \
-            -e REVERSE_GEOCODE_API_KEY=${{ secrets.DEV_REVERSE_GEOCODE_API_KEY }} \
+            -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            -e SUPABASE_LOOKUP_BUCKET=${{ secrets.SUPABASE_LOOKUP_BUCKET }} \
+            -e SUPABASE_SECRET_KEY=${{ secrets.SUPABASE_SECRET_KEY }} \
+            -e GEOCODE_API_KEY=${{ secrets.GEOCODE_API_KEY }} \
+            -e REVERSE_GEOCODE_API_KEY=${{ secrets.REVERSE_GEOCODE_API_KEY }} \
             -e SERVER_PORT=8080 \
             ${{ secrets.DOCKER_USERNAME }}/rudra-app-service:dev
 
