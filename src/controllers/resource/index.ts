@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { uploadFileToStorage } from "@/utils/file-upload";
+import { nanoid } from "nanoid";
 
 export const uploadResource = async (req: Request, res: Response) => {
   try {
@@ -10,9 +11,19 @@ export const uploadResource = async (req: Request, res: Response) => {
       return;
     }
 
+    const formId = req.body.formId || nanoid();
+    const source = req.body.source || "unknown";
+
+    const date = new Date();
+    const currentDateInIST = new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
+    const uploadTimestamp = currentDateInIST
+      .toISOString()
+      .replace("Z", "+05:30");
+
     const uploadResult = await uploadFileToStorage(file, {
       bucket: "submissions",
-      folder: "uploads",
+      folder: `uploads/${req.user.id}/${formId}`,
+      fileName: `${source}_${uploadTimestamp}`,
     });
 
     if (!uploadResult.success) {

@@ -152,6 +152,7 @@ router.get("/", getAllSightings);
  *           schema:
  *             type: object
  *             required:
+ *               - submissionId
  *               - observedAt
  *               - latitude
  *               - longitude
@@ -164,6 +165,11 @@ router.get("/", getAllSightings);
  *               - waterBody
  *               - threats
  *             properties:
+ *               submissionId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Unique identifier for the sighting submission (UUID format)
+ *                 example: 550e8400-e29b-41d4-a716-446655440000
  *               observedAt:
  *                 type: string
  *                 format: date-time

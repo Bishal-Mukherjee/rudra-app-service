@@ -64,6 +64,7 @@ export interface SpeciesData {
 }
 
 export interface ReportingReqBody {
+  submissionId: string;
   observedAt: string;
   latitude: number;
   longitude: number;

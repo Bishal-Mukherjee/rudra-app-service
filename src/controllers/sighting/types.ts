@@ -48,6 +48,7 @@ export interface SpeciesData {
 }
 
 export interface SightingReqBody {
+  submissionId: string;
   observedAt: string;
   latitude: number;
   longitude: number;

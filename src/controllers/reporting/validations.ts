@@ -1,6 +1,7 @@
 import Joi from "joi";
 
 export const postReportingSchema = Joi.object({
+  submissionId: Joi.string().uuid().optional(),
   latitude: Joi.number().invalid(0).required().messages({
     "number.base": "Latitude must be a number",
     "number.invalid": "Latitude must be a valid latitude",

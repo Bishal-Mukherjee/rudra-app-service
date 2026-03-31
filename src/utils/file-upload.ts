@@ -1,7 +1,6 @@
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
 import multer from "multer";
-import { nanoid } from "nanoid";
 import { config } from "@/config/config";
 
 const supabase = createClient(config.supabase.url, config.supabase.secretKey);
@@ -9,6 +8,7 @@ const supabase = createClient(config.supabase.url, config.supabase.secretKey);
 interface UploadOptions {
   bucket: string;
   folder?: string;
+  fileName: string;
   maxSize?: number; // in MB
 }
 
@@ -23,7 +23,7 @@ export const uploadFileToStorage = async (
   file: Express.Multer.File,
   options: UploadOptions,
 ): Promise<UploadResult> => {
-  const { bucket, folder = "uploads", maxSize = 15 } = options;
+  const { bucket, folder = "uploads", fileName, maxSize = 15 } = options;
 
   try {
     // Check file size
@@ -36,9 +36,8 @@ export const uploadFileToStorage = async (
     }
 
     const extension = path.extname(file.originalname);
-    const fileId = nanoid();
-    const fileName = `${fileId}${extension}`;
-    const filePath = `${folder}/${fileName}`;
+    const fileNameWithExt = `${fileName}${extension}`;
+    const filePath = `${folder}/${fileNameWithExt}`;
 
     const { data, error } = await supabase.storage
       .from(bucket)
