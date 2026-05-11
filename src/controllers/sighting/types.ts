@@ -52,6 +52,7 @@ export interface SightingReqBody {
   latitude: number;
   longitude: number;
   villageOrGhat?: string;
+  landmark?: string;
   district?: string;
   block?: string;
   state?: string;

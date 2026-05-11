@@ -3,33 +3,33 @@ import { config } from "@/config/config";
 export const speciesAgeGroups = {
   duo: [
     {
-      label: { en: "Adults", bn: "Adults" },
+      label: { en: "Adults", bn: "পূর্ণবয়স্ক" },
       value: "adult",
     },
     {
-      label: { en: "Calves", bn: "Calves" },
+      label: { en: "Calves", bn: "শাবক" },
       value: "subAdult",
     },
     // {
-    //   label: { en: "Unidentified", bn: "Unidentified" },
+    //   label: { en: "Unidentified", bn: "শনাক্ত করা যায়নি" },
     //   value: "unidentified",
     // },
   ],
   trio: [
     {
-      label: { en: "Adult Male", bn: "Adult Male" },
+      label: { en: "Adult Male", bn: "পূর্ণবয়স্ক পুরুষ" },
       value: "adultMale",
     },
     {
-      label: { en: "Adult Female", bn: "Adult Female" },
+      label: { en: "Adult Female", bn: "পূর্ণবয়স্ক স্ত্রী" },
       value: "adultFemale",
     },
     {
-      label: { en: "Sub-Adults/Juveniles", bn: "Sub-Adults/Juveniles" },
+      label: { en: "Sub-Adults/Juveniles", bn: "কিশোর/অপ্রাপ্তবয়স্ক" },
       value: "subAdult",
     },
     {
-      label: { en: "Unidentified", bn: "Unidentified" },
+      label: { en: "Unidentified", bn: "শনাক্ত করা যায়নি" },
       value: "unidentified",
     },
   ],
@@ -39,14 +39,14 @@ export const confirmationOptions = [
   {
     label: {
       en: "Yes",
-      bn: "Yes",
+      bn: "হ্যাঁ",
     },
     value: "YES",
   },
   {
     label: {
       en: "No",
-      bn: "No",
+      bn: "না",
     },
     value: "NO",
   },

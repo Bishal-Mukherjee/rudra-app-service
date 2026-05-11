@@ -57,7 +57,7 @@ export const getAllQuestions = async (
       getStaticLookup("water_body_conditions"),
       getStaticLookup("weather_conditions"),
       pool.query(
-        "SELECT index, topic, label_en, label_bn, option_key, type, is_optional FROM questions WHERE contexts @> $1::text[]",
+        "SELECT index, topic, label_en, label_bn, option_key, type, mode, is_optional FROM questions WHERE contexts @> $1::text[]",
         [[typeInUpperCase]],
       ),
     ]);
@@ -102,6 +102,7 @@ export const getAllQuestions = async (
             bn: question.label_bn,
           },
           type: question.type,
+          mode: question.mode,
           isOptional: question.is_optional,
         };
 
