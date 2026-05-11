@@ -36,11 +36,12 @@ export const postSighting = async (req: Request, res: Response) => {
     await client.query("BEGIN");
 
     const query = await client.query(
-      `INSERT INTO sightings (submitted_by, observed_at, latitude, longitude,
+      `INSERT INTO sightings (id, submitted_by, observed_at, latitude, longitude,
       village_or_ghat, landmark, district, block, state, water_body_condition, weather_condition,
        water_body, threats, fishing_gears, images, notes, submission_context)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id`,
       [
+        body.submissionId,
         id,
         body.observedAt,
         body.latitude,
