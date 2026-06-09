@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Request, Response } from "express";
+import { CACHE_KEYS, CACHE_TTL } from "@/config/cache";
 import { redisClient } from "@/config/redis";
 import { DistrictBlocks } from "@/controllers/question/types";
 import { getStaticLookup } from "@/utils/static-lookup";
@@ -125,7 +126,7 @@ export const getReverseGeocode = async (
     // TODO: Confirm if rounding is acceptable for the application
     const roundedLat = Number(lat).toFixed(3);
     const roundedLng = Number(lng).toFixed(3);
-    const cacheKey = `reverse_geocode:${roundedLat},${roundedLng}`;
+    const cacheKey = CACHE_KEYS.reverseGeocode(roundedLat, roundedLng);
 
     const [districtsData, cachedData] = await Promise.all([
       getStaticLookup("districts"),
@@ -165,11 +166,9 @@ export const getReverseGeocode = async (
 
     const geocodeData = response.data.results[0];
 
-    redisClient.set(
-      cacheKey,
-      JSON.stringify(geocodeData),
-      { EX: 345600 }, // 96 hours
-    );
+    redisClient.set(cacheKey, JSON.stringify(geocodeData), {
+      EX: CACHE_TTL.reverseGeocode,
+    });
 
     const result = buildReverseGeocodeResult(geocodeData, districtsData);
 
