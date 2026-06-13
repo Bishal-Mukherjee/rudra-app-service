@@ -1,10 +1,9 @@
 import path from "path";
-import { createClient } from "@supabase/supabase-js";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import multer from "multer";
 import { nanoid } from "nanoid";
 import { config } from "@/config/config";
-
-const supabase = createClient(config.supabase.url, config.supabase.secretKey);
+import { s3Client } from "@/utils/s3-client";
 
 interface UploadOptions {
   bucket: string;
@@ -38,32 +37,26 @@ export const uploadFileToStorage = async (
     const extension = path.extname(file.originalname);
     const fileId = nanoid();
     const fileName = `${fileId}${extension}`;
-    const filePath = `${folder}/${fileName}`;
+    const objectKey = `${bucket}/${folder}/${fileName}`;
 
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file.buffer, {
-        contentType: file.mimetype,
-        upsert: false,
-      });
-
-    if (error) {
-      console.log(error);
-      return {
-        success: false,
-        error: "Failed to upload file to storage",
-      };
-    }
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: config.s3.bucket,
+        Key: objectKey,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      }),
+    );
 
     return {
       success: true,
-      filePath: data.fullPath,
+      filePath: objectKey,
     };
   } catch (err) {
     console.log(err);
     return {
       success: false,
-      error: "Internal server error during upload",
+      error: "Failed to upload file to storage",
     };
   }
 };
