@@ -15,6 +15,8 @@ interface Config {
     name: string;
     user: string;
     password: string;
+    ssl: boolean;
+    poolMax: number;
   };
   redis: {
     username: string;
@@ -60,6 +62,8 @@ const dbConfig = () => {
     name: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
+    ssl: process.env.DB_SSL !== "false",
+    poolMax: Number(process.env.DB_POOL_MAX) || 10,
   };
 };
 

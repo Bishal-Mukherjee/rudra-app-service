@@ -37,6 +37,8 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      DB_SSL: ${DB_SSL:-true}
+      DB_POOL_MAX: ${DB_POOL_MAX:-10}
       JWT_SECRET: ${JWT_SECRET}
       REDIS_USERNAME: ${REDIS_USERNAME}
       REDIS_PASSWORD: ${REDIS_PASSWORD}

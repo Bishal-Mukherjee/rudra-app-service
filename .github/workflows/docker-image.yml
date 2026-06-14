@@ -69,6 +69,8 @@ jobs:
             -e DB_NAME=${{ secrets.DB_NAME }} \
             -e DB_USER=${{ secrets.DB_USER }} \
             -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e DB_SSL=${{ secrets.DB_SSL }} \
+            -e DB_POOL_MAX=${{ secrets.DB_POOL_MAX }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e REDIS_USERNAME=${{ secrets.REDIS_USERNAME }} \
             -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
@@ -121,6 +123,8 @@ jobs:
             -e DB_NAME=${{ secrets.DB_NAME }} \
             -e DB_USER=${{ secrets.DB_USER }} \
             -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e DB_SSL=${{ secrets.DB_SSL }} \
+            -e DB_POOL_MAX=${{ secrets.DB_POOL_MAX }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e REDIS_USERNAME=${{ secrets.REDIS_USERNAME }} \
             -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
