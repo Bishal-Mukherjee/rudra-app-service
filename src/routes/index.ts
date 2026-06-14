@@ -12,6 +12,7 @@ import reportingRoutes from "@/routes/reporting";
 import submissionRoutes from "@/routes/submission";
 import notificationRoutes from "@/routes/notifications";
 import resourceRoutes from "@/routes/resource";
+import uploadLogRoutes from "@/routes/upload-log";
 
 const router = express.Router();
 
@@ -27,5 +28,6 @@ router.use("/tier", authenticate, tierRoutes);
 router.use("/module", authenticate, moduleRoutes);
 router.use("/notifications", authenticate, notificationRoutes);
 router.use("/resource", authenticate, resourceRoutes);
+router.use("/logs", uploadLogRoutes);
 
 export { router };
