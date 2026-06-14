@@ -15,6 +15,7 @@ interface UploadOptions {
 interface UploadResult {
   success: boolean;
   filePath?: string;
+  publicUrl?: string;
   error?: string;
 }
 
@@ -55,9 +56,14 @@ export const uploadFileToStorage = async (
       };
     }
 
+    const { data: publicUrlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(filePath);
+
     return {
       success: true,
-      filePath: data.fullPath,
+      filePath: data.path,
+      publicUrl: publicUrlData.publicUrl,
     };
   } catch (err) {
     console.log(err);
@@ -98,3 +104,39 @@ export const createUploadMiddleware = (maxSizeMB: number = 15) => {
 };
 
 export const uploadMiddleware = createUploadMiddleware(15);
+
+const LOG_FILE_EXTENSIONS = [".db", ".txt"];
+
+const createLogFileFilter = (maxSizeMB: number = 15) => {
+  return (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    const contentLength = parseInt(req.headers["content-length"] || "0");
+    const maxSize = maxSizeMB * 1024 * 1024;
+
+    if (contentLength > maxSize) {
+      const error = new Error("File too large") as any;
+      error.code = "LIMIT_FILE_SIZE";
+      return cb(error, false);
+    }
+
+    const extension = path.extname(file.originalname).toLowerCase();
+    if (!LOG_FILE_EXTENSIONS.includes(extension)) {
+      return cb(new Error("Only .db and .txt files are allowed"));
+    }
+
+    cb(null, true);
+  };
+};
+
+export const createLogUploadMiddleware = (maxSizeMB: number = 15) => {
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: maxSizeMB * 1024 * 1024,
+    },
+    fileFilter: createLogFileFilter(maxSizeMB),
+  });
+
+  return upload.single("file");
+};
+
+export const logUploadMiddleware = createLogUploadMiddleware(15);
