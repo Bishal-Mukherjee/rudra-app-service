@@ -15,7 +15,7 @@ const poolConfig: PoolConfig = {
 };
 
 if (config.db.ssl) {
-  const caCertPath = path.join(process.cwd(), "global-bundle.pem");
+  const caCertPath = path.join(process.cwd(), "certs/global-bundle.pem");
 
   poolConfig.ssl = {
     ca: fs.readFileSync(caCertPath).toString(),
