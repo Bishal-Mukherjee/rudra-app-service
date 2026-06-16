@@ -1,5 +1,4 @@
 import fs from "fs";
-import path from "path";
 import { Pool, PoolConfig } from "pg";
 import { config } from "@/config/config";
 
@@ -15,10 +14,8 @@ const poolConfig: PoolConfig = {
 };
 
 if (config.db.ssl) {
-  const caCertPath = path.join(process.cwd(), "certs/global-bundle.pem");
-
   poolConfig.ssl = {
-    ca: fs.readFileSync(caCertPath).toString(),
+    ca: fs.readFileSync(config.db.caCertPath).toString(),
     rejectUnauthorized: true,
   };
 }

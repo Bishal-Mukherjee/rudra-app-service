@@ -93,6 +93,11 @@ This is the backend service that powers the mobile app used by volunteers to rep
 
 2. **Configure environment:**
    - Add `.env` and fill in required values (DB, Redis, Twilio, AWS S3, etc).
+   - Download the RDS CA cert for local SSL connections:
+     ```sh
+     npm run setup:certs
+     ```
+     This saves `global-bundle.pem` to `./certs/` (gitignored). Docker images fetch the cert automatically at build time.
 
 3. **Run in development:**
 

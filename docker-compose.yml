@@ -39,6 +39,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_SSL: ${DB_SSL:-true}
       DB_POOL_MAX: ${DB_POOL_MAX:-10}
+      RDS_CA_CERT_PATH: ${RDS_CA_CERT_PATH:-/app/certs/global-bundle.pem}
       JWT_SECRET: ${JWT_SECRET}
       REDIS_USERNAME: ${REDIS_USERNAME}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
@@ -55,4 +56,5 @@ services:
       AWS_S3_LOOKUP_FOLDER: ${AWS_S3_LOOKUP_FOLDER}
       GEOCODE_API_KEY: ${GEOCODE_API_KEY}
       REVERSE_GEOCODE_API_KEY: ${REVERSE_GEOCODE_API_KEY}
+      REPORT_API_URL: ${REPORT_API_URL}
     restart: unless-stopped
