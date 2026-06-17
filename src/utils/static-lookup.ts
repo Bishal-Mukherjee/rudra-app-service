@@ -1,18 +1,8 @@
-import axios from "axios";
 import { config } from "@/config/config";
+import { getS3ObjectJson } from "@/utils/s3-client";
 
-export const getStaticLookup = async (fileName: string) => {
+export const getStaticLookup = async (fileName: string): Promise<any> => {
   if (!fileName) return null;
 
-  try {
-    const url = `${config.supabase.url}/storage/v1/object/${config.supabase.lookupBucket}/${fileName}.json`;
-    const response = await axios({
-      url,
-      method: "GET",
-    });
-    return response.data;
-  } catch (err) {
-    console.error("Error fetching static lookup:", err);
-    return null;
-  }
+  return getS3ObjectJson(`${config.s3.lookupFolder}/${fileName}.json`);
 };

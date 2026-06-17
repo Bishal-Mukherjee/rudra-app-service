@@ -1,13 +1,23 @@
-import { Pool } from "pg";
+import fs from "fs";
+import { Pool, PoolConfig } from "pg";
 import { config } from "@/config/config";
 
-export const pool = new Pool({
+const poolConfig: PoolConfig = {
   user: config.db.user,
   database: config.db.name,
   host: config.db.host,
   port: config.db.port,
   password: config.db.password,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
+  max: config.db.poolMax,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+};
+
+if (config.db.ssl) {
+  poolConfig.ssl = {
+    ca: fs.readFileSync(config.db.caCertPath).toString(),
+    rejectUnauthorized: true,
+  };
+}
+
+export const pool = new Pool(poolConfig);

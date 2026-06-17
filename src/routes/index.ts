@@ -1,5 +1,6 @@
 import express from "express";
 import { authenticate } from "@/middlewares/authenticate";
+import { authenticateAdmin } from "@/middlewares/authenticate-admin";
 import authRoutes from "@/routes/auth";
 import userRoutes from "@/routes/user";
 import speciesRoutes from "@/routes/species";
@@ -12,7 +13,7 @@ import reportingRoutes from "@/routes/reporting";
 import submissionRoutes from "@/routes/submission";
 import notificationRoutes from "@/routes/notifications";
 import resourceRoutes from "@/routes/resource";
-import uploadLogRoutes from "@/routes/upload-log";
+import reportsRoutes from "@/routes/reports";
 
 const router = express.Router();
 
@@ -28,6 +29,6 @@ router.use("/tier", authenticate, tierRoutes);
 router.use("/module", authenticate, moduleRoutes);
 router.use("/notifications", authenticate, notificationRoutes);
 router.use("/resource", authenticate, resourceRoutes);
-router.use("/logs", uploadLogRoutes);
+router.use("/reports", authenticateAdmin, reportsRoutes);
 
 export { router };

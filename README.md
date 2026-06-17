@@ -8,8 +8,8 @@ This is the backend service that powers the mobile app used by volunteers to rep
 
 - **Node.js**
 - **Express.js + TypeScript**
-- **PostgreSQL**
-- **Supabase (Storage)**
+- **PostgreSQL (AWS RDS)**
+- **AWS S3 (Storage)**
 - **Redis (Caching)**
 - **Twilio (SMS Verification)**
 - **Docker** & **Vercel** (Deployment)
@@ -92,7 +92,12 @@ This is the backend service that powers the mobile app used by volunteers to rep
    ```
 
 2. **Configure environment:**
-   - Add `.env` and fill in required values (DB, Redis, Twilio, Supabase, etc).
+   - Add `.env` and fill in required values (DB, Redis, Twilio, AWS S3, etc).
+   - Download the RDS CA cert for local SSL connections:
+     ```sh
+     npm run setup:certs
+     ```
+     This saves `global-bundle.pem` to `./certs/` (gitignored). Docker images fetch the cert automatically at build time.
 
 3. **Run in development:**
 
@@ -143,7 +148,7 @@ This is the backend service that powers the mobile app used by volunteers to rep
   - Auth (OTP via Twilio)
   - Sighting & Reporting (CRUD)
   - Species, Region, Tier, Module, Notifications
-  - File uploads (Supabase Storage)
+  - File uploads (AWS S3)
 
 ### 📚 API Documentation (Swagger)
 

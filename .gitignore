@@ -2,3 +2,5 @@ dist
 node_modules
 .env.development
 .env.staging
+/certs/
+/migrations/
