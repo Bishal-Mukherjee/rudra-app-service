@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticate } from "@/middlewares/authenticate";
-import { authenticateAdmin } from "@/middlewares/authenticate-admin";
+// import { authenticateAdmin } from "@/middlewares/authenticate-admin";
 import authRoutes from "@/routes/auth";
 import userRoutes from "@/routes/user";
 import speciesRoutes from "@/routes/species";
@@ -29,6 +29,6 @@ router.use("/tier", authenticate, tierRoutes);
 router.use("/module", authenticate, moduleRoutes);
 router.use("/notifications", authenticate, notificationRoutes);
 router.use("/resource", authenticate, resourceRoutes);
-router.use("/reports", authenticateAdmin, reportsRoutes);
+router.use("/reports", reportsRoutes);
 
 export { router };
