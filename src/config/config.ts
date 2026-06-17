@@ -15,6 +15,9 @@ interface Config {
     name: string;
     user: string;
     password: string;
+    ssl: boolean;
+    poolMax: number;
+    caCertPath: string;
   };
   redis: {
     username: string;
@@ -49,7 +52,8 @@ const dbConfig = () => {
     !process.env.DB_PORT ||
     !process.env.DB_NAME ||
     !process.env.DB_USER ||
-    !process.env.DB_PASSWORD
+    !process.env.DB_PASSWORD ||
+    !process.env.RDS_CA_CERT_PATH
   ) {
     throw new Error("Missing database configuration");
   }
@@ -60,6 +64,9 @@ const dbConfig = () => {
     name: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
+    ssl: process.env.DB_SSL !== "false",
+    poolMax: Number(process.env.DB_POOL_MAX) || 10,
+    caCertPath: process.env.RDS_CA_CERT_PATH,
   };
 };
 
