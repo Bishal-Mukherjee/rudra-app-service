@@ -97,11 +97,18 @@ export const getGeocode = async (
       return;
     }
 
+    const lat = Number(
+      response.data.results[0]?.geometry?.location?.lat,
+    ).toFixed(7);
+    const lng = Number(
+      response.data.results[0]?.geometry?.location?.lng,
+    ).toFixed(7);
+
     res.status(200).json({
       message: "Location fetched successfully",
       result: {
-        lat: response.data.results[0]?.geometry?.location?.lat || null,
-        lng: response.data.results[0]?.geometry?.location?.lng || null,
+        lat: lat || null,
+        lng: lng || null,
         state: state || null,
       },
     });

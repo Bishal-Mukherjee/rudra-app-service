@@ -59,7 +59,8 @@ export const LIVE_REPORTING = "LIVE_REPORTING",
   ACTIVE = "ACTIVE",
   ADMIN = "ADMIN",
   SIGHTER = "SIGHTER",
-  WINDY_OR_STORMY = "WINDY_OR_STORMY";
+  WINDY_OR_STORMY = "WINDY_OR_STORMY",
+  SUSPENDED = "SUSPENDED";
 
 export const geocodingApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?key=${config.geocoding.geocodeKey}`;
 
