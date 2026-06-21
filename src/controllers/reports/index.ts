@@ -15,7 +15,7 @@ export const generateReport = async (req: Request, res: Response) => {
       response.headers["content-type"] ?? "application/octet-stream";
     const contentDisposition = response.headers["content-disposition"];
 
-    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Type", contentType as string);
     if (contentDisposition) {
       res.setHeader("Content-Disposition", contentDisposition);
     }

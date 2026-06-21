@@ -49,10 +49,6 @@ export const uploadFileToStorage = async (
       }),
     );
 
-    const { data: publicUrlData } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
-
     return {
       success: true,
       filePath: objectKey,
@@ -100,7 +96,11 @@ export const uploadMiddleware = createUploadMiddleware(15);
 const LOG_FILE_EXTENSIONS = [".db", ".txt"];
 
 const createLogFileFilter = (maxSizeMB: number = 15) => {
-  return (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  return (
+    req: any,
+    file: Express.Multer.File,
+    cb: multer.FileFilterCallback,
+  ) => {
     const contentLength = parseInt(req.headers["content-length"] || "0");
     const maxSize = maxSizeMB * 1024 * 1024;
 

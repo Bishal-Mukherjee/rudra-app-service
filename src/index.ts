@@ -59,7 +59,10 @@ redisClient
 
 // Routes
 app.get("/", (req, res) => {
-  res.send(" 🚀🚀 SERVER WORKING ");
+  res.json({
+    message: "Server is running",
+    version: "1.0.0",
+  });
 });
 
 // Swagger Documentation
