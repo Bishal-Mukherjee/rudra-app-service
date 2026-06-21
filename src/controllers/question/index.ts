@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "@/config/db";
+import { CACHE_KEYS, CACHE_TTL } from "@/config/cache";
 import { redisClient } from "@/config/redis";
 import {
   LabelOption,
@@ -29,7 +30,7 @@ export const getAllQuestions = async (
     const questionType =
       typeInUpperCase.charAt(0) + typeInUpperCase.slice(1).toLowerCase();
 
-    const cachedKey = `question_set:${questionTypeParam.toLowerCase()}`;
+    const cachedKey = CACHE_KEYS.questionSet(questionTypeParam);
     const cachedData = await redisClient.get(cachedKey);
 
     if (cachedData) {
@@ -117,7 +118,7 @@ export const getAllQuestions = async (
       });
 
     await redisClient.set(cachedKey, JSON.stringify(questions), {
-      EX: 604800, // 7 days (60 * 60 * 24 * 7)
+      EX: CACHE_TTL.questionSet,
     });
 
     res.status(200).json({

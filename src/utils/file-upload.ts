@@ -1,10 +1,9 @@
 import path from "path";
-import { createClient } from "@supabase/supabase-js";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import multer from "multer";
 import { nanoid } from "nanoid";
 import { config } from "@/config/config";
-
-const supabase = createClient(config.supabase.url, config.supabase.secretKey);
+import { s3Client } from "@/utils/s3-client";
 
 interface UploadOptions {
   bucket: string;
@@ -39,37 +38,26 @@ export const uploadFileToStorage = async (
     const extension = path.extname(file.originalname);
     const fileId = nanoid();
     const fileName = `${fileId}${extension}`;
-    const filePath = `${folder}/${fileName}`;
+    const objectKey = `${bucket}/${folder}/${fileName}`;
 
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file.buffer, {
-        contentType: file.mimetype,
-        upsert: false,
-      });
-
-    if (error) {
-      console.log(error);
-      return {
-        success: false,
-        error: "Failed to upload file to storage",
-      };
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: config.s3.bucket,
+        Key: objectKey,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      }),
+    );
 
     return {
       success: true,
-      filePath: data.path,
-      publicUrl: publicUrlData.publicUrl,
+      filePath: objectKey,
     };
   } catch (err) {
     console.log(err);
     return {
       success: false,
-      error: "Internal server error during upload",
+      error: "Failed to upload file to storage",
     };
   }
 };
@@ -108,7 +96,11 @@ export const uploadMiddleware = createUploadMiddleware(15);
 const LOG_FILE_EXTENSIONS = [".db", ".txt"];
 
 const createLogFileFilter = (maxSizeMB: number = 15) => {
-  return (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  return (
+    req: any,
+    file: Express.Multer.File,
+    cb: multer.FileFilterCallback,
+  ) => {
     const contentLength = parseInt(req.headers["content-length"] || "0");
     const maxSize = maxSizeMB * 1024 * 1024;
 

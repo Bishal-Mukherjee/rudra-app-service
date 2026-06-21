@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { pool } from "@/config/db";
 import { config } from "@/config/config";
-import { ONBOARDED, ADMIN, ACTIVE } from "@/constants/constants";
+import { ONBOARDED, ADMIN, ACTIVE, SUSPENDED } from "@/constants/constants";
 import {
   signinSchema,
   signupSchema,
@@ -182,7 +182,7 @@ export const signin = async (
           return;
         }
 
-        if (query.rows[0].status === "SUSPENDED") {
+        if (query.rows[0].status === SUSPENDED) {
           res.status(423).json({
             message: "Your account has been suspended by the administrator",
           });
@@ -271,7 +271,7 @@ export const signin = async (
       return;
     }
 
-    if (query.rows[0].status === "SUSPENDED") {
+    if (query.rows[0].status === SUSPENDED) {
       res.status(423).json({
         message: "Your account has been suspended by the administrator",
       });

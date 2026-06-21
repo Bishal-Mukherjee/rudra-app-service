@@ -69,6 +69,8 @@ jobs:
             -e DB_NAME=${{ secrets.DB_NAME }} \
             -e DB_USER=${{ secrets.DB_USER }} \
             -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e DB_SSL=${{ secrets.DB_SSL }} \
+            -e DB_POOL_MAX=${{ secrets.DB_POOL_MAX }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e REDIS_USERNAME=${{ secrets.REDIS_USERNAME }} \
             -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
@@ -78,11 +80,14 @@ jobs:
             -e TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }} \
             -e TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }} \
             -e TWILIO_APP_HASH=${{ secrets.TWILIO_APP_HASH }} \
-            -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-            -e SUPABASE_LOOKUP_BUCKET=${{ secrets.SUPABASE_LOOKUP_BUCKET }} \
-            -e SUPABASE_SECRET_KEY=${{ secrets.SUPABASE_SECRET_KEY }} \
+            -e AWS_S3_REGION=${{ secrets.AWS_S3_REGION }} \
+            -e AWS_S3_ACCESS_KEY_ID=${{ secrets.AWS_S3_ACCESS_KEY_ID }} \
+            -e AWS_S3_SECRET_ACCESS_KEY=${{ secrets.AWS_S3_SECRET_ACCESS_KEY }} \
+            -e AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }} \
+            -e AWS_S3_LOOKUP_FOLDER=${{ secrets.AWS_S3_LOOKUP_FOLDER }} \
             -e GEOCODE_API_KEY=${{ secrets.GEOCODE_API_KEY }} \
             -e REVERSE_GEOCODE_API_KEY=${{ secrets.REVERSE_GEOCODE_API_KEY }} \
+            -e REPORT_API_URL=${{ secrets.REPORT_API_URL }} \
             -e SERVER_PORT=8080 \
             ${{ secrets.DOCKER_USERNAME }}/rudra-app-service:latest
 
@@ -111,6 +116,7 @@ jobs:
         run: |
           docker run -d -p 8080:8080 \
             --name rudra-app-service-container \
+            --network rudra-net \
             --restart unless-stopped \
             -e NODE_ENV=development \
             -e DB_HOST=${{ secrets.DB_HOST }} \
@@ -118,6 +124,8 @@ jobs:
             -e DB_NAME=${{ secrets.DB_NAME }} \
             -e DB_USER=${{ secrets.DB_USER }} \
             -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e DB_SSL=${{ secrets.DB_SSL }} \
+            -e DB_POOL_MAX=${{ secrets.DB_POOL_MAX }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e REDIS_USERNAME=${{ secrets.REDIS_USERNAME }} \
             -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
@@ -127,11 +135,14 @@ jobs:
             -e TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }} \
             -e TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }} \
             -e TWILIO_APP_HASH=${{ secrets.TWILIO_APP_HASH }} \
-            -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-            -e SUPABASE_LOOKUP_BUCKET=${{ secrets.SUPABASE_LOOKUP_BUCKET }} \
-            -e SUPABASE_SECRET_KEY=${{ secrets.SUPABASE_SECRET_KEY }} \
+            -e AWS_S3_REGION=${{ secrets.AWS_S3_REGION }} \
+            -e AWS_S3_ACCESS_KEY_ID=${{ secrets.AWS_S3_ACCESS_KEY_ID }} \
+            -e AWS_S3_SECRET_ACCESS_KEY=${{ secrets.AWS_S3_SECRET_ACCESS_KEY }} \
+            -e AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }} \
+            -e AWS_S3_LOOKUP_FOLDER=${{ secrets.AWS_S3_LOOKUP_FOLDER }} \
             -e GEOCODE_API_KEY=${{ secrets.GEOCODE_API_KEY }} \
             -e REVERSE_GEOCODE_API_KEY=${{ secrets.REVERSE_GEOCODE_API_KEY }} \
+            -e REPORT_API_URL=${{ secrets.REPORT_API_URL }} \
             -e SERVER_PORT=8080 \
             ${{ secrets.DOCKER_USERNAME }}/rudra-app-service:dev
 

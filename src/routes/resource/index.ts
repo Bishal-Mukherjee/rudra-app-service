@@ -40,8 +40,8 @@ const router = express.Router();
  *                   properties:
  *                     filePath:
  *                       type: string
- *                       description: URL or path to the uploaded file
- *                       example: https://storage.example.com/submissions/uploads/image_12345.jpg
+ *                       description: Private object path in S3 (store this; use signed-url endpoint to view)
+ *                       example: parent/folder/image_12345.jpg
  *       400:
  *         description: No file provided
  *         content:
