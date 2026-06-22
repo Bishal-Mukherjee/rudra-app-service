@@ -61,7 +61,7 @@ redisClient
 app.get("/", (req, res) => {
   res.json({
     message: "Server is running",
-    version: "1.0.5",
+    version: "1.0.6",
   });
 });
 
