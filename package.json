@@ -1,6 +1,6 @@
 {
   "name": "rudra-app-service",
-  "version": "1.0.0",
+  "version": "1.0.7",
   "main": "src/index.ts",
   "license": "MIT",
   "scripts": {

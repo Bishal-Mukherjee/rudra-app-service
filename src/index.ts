@@ -13,6 +13,7 @@ import { swaggerSpec } from "@/config/swagger";
 import { rateLimiter } from "@/utils/rate-limit";
 import { router as apiRoutes } from "@/routes";
 import { errorHandler } from "@/middlewares/error-handler";
+import packageJson from "../package.json";
 
 const app = express();
 
@@ -61,7 +62,7 @@ redisClient
 app.get("/", (req, res) => {
   res.json({
     message: "Server is running",
-    version: "1.0.6",
+    version: packageJson.version,
   });
 });
 

@@ -1,5 +1,9 @@
 import express from "express";
-import { getTiers, upgradeTier } from "@/controllers/tier";
+import { getTiers } from "@/controllers/tier";
+import {
+  getTierQuestions,
+  submitTierAssessment,
+} from "@/controllers/tier-assessment";
 
 const router = express.Router();
 
@@ -87,37 +91,87 @@ router.get("/", getTiers);
 
 /**
  * @swagger
- * /tier/upgrade:
+ * /tier/{tier}/questions:
  *   get:
- *     summary: Upgrade user tier
- *     description: Upgrade the authenticated user's tier to the next level (e.g., from TIER_1 to TIER_2). The user must have completed the requirements of their current tier before upgrading.
+ *     summary: Get tier assessment questions
+ *     description: Retrieve active MCQ questions for the authenticated user's current tier assessment. Only available when the requested tier matches the user's current tier.
  *     tags: [Tier]
+ *     parameters:
+ *       - in: path
+ *         name: tier
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: TIER_1
+ *         description: Tier level identifier
  *     responses:
  *       200:
- *         description: User tier upgraded successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User tier upgraded successfully
+ *         description: Tier assessment questions fetched successfully
+ *       400:
+ *         description: Invalid tier
+ *       403:
+ *         description: Forbidden - tier does not match user's current tier
+ *       404:
+ *         description: No assessment questions found for tier
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
- *       404:
- *         description: Next tier not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Next tier not found
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-router.get("/upgrade", upgradeTier);
+router.get("/:tier/questions", getTierQuestions);
+
+/**
+ * @swagger
+ * /tier/{tier}/assessment:
+ *   post:
+ *     summary: Submit tier assessment
+ *     description: Submit answers for the current tier assessment. The user is promoted to the next tier only when all answers are correct.
+ *     tags: [Tier]
+ *     parameters:
+ *       - in: path
+ *         name: tier
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: TIER_1
+ *         description: Tier level identifier
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - answers
+ *             properties:
+ *               answers:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - question
+ *                     - option
+ *                   properties:
+ *                     question:
+ *                       type: string
+ *                       format: uuid
+ *                     option:
+ *                       type: string
+ *                       format: uuid
+ *     responses:
+ *       200:
+ *         description: Tier assessment submitted successfully
+ *       400:
+ *         description: Validation error or incomplete submission
+ *       403:
+ *         description: Forbidden - tier does not match user's current tier
+ *       404:
+ *         description: No assessment questions found for tier
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+router.post("/:tier/assessment", submitTierAssessment);
 
 export default router;

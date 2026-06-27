@@ -70,37 +70,3 @@ export const getTiers = async (req: Request, res: Response) => {
   }
 };
 
-export const upgradeTier = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.user;
-
-    const { rows: userQuery } = await pool.query(
-      "SELECT * FROM users WHERE id = $1",
-      [id],
-    );
-
-    const { tier: userTier } = userQuery[0];
-
-    const tierLevel = userTier.split("_").pop();
-    const nextTierLevel = `TIER_${parseInt(tierLevel) + 1}`;
-
-    const tierQuery = await pool.query("SELECT id from tiers WHERE tier = $1", [
-      nextTierLevel,
-    ]);
-
-    if (tierQuery.rows.length === 0) {
-      res.status(404).json({ message: "Next tier not found" });
-      return;
-    }
-
-    await pool.query("UPDATE users SET tier = $1 WHERE id = $2", [
-      nextTierLevel,
-      id,
-    ]);
-
-    res.status(200).json({ message: "User tier upgraded successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
