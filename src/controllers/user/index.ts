@@ -51,6 +51,11 @@ export const getUserDetails = async (req: Request, res: Response) => {
     );
     const modulesLastUpdatedAt = modulesRows[0].lastupdatedat;
 
+    const { rows: tierQuestionsRows } = await pool.query(
+      `SELECT MAX(last_updated_at) AS lastUpdatedAt FROM tier_questions`,
+    );
+    const tierQuestionsLastUpdatedAt = tierQuestionsRows[0].lastupdatedat;
+
     const { rows: notificationsRows } = await pool.query(
       `SELECT MAX(created_at) AS lastUpdatedAt FROM notifications WHERE recipient_role = $1`,
       [query.rows[0].role],
@@ -62,6 +67,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
       species: speciesLastUpdatedAt,
       tier: tierLastUpdatedAt,
       modules: modulesLastUpdatedAt,
+      tierQuestions: tierQuestionsLastUpdatedAt,
       notifications: notificationsLastUpdatedAt,
     };
 

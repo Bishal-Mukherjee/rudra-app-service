@@ -13,6 +13,7 @@
       "@/controllers/*": ["src/controllers/*"],
       "@middlewares/*": ["src/middlewares/*"]
     },
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
