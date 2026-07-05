@@ -55,7 +55,9 @@ export const getTierQuestions = async (
     );
 
     if (questionRows.length === 0) {
-      res.status(404).json({ message: "No assessment questions found for tier" });
+      res
+        .status(404)
+        .json({ message: "No assessment questions found for tier" });
       return;
     }
 
@@ -80,18 +82,19 @@ export const getTierQuestions = async (
     }, {});
 
     const questions = questionRows.map((question) => ({
-      id: question.id,
+      topic: question.id, // was id, now topic
       label: {
         en: question.label_en,
         bn: question.label_bn,
       },
       options: (optionsByQuestionId[question.id] || []).map((option) => ({
-        id: option.id,
+        value: option.id, // was id, now value
         label: {
           en: option.label_en,
           bn: option.label_bn,
         },
       })),
+      type: "SINGLE-SELECT", // hardcoded for now
     }));
 
     res.status(200).json({
@@ -163,7 +166,9 @@ export const submitTierAssessment = async (
 
     if (questionRows.length === 0) {
       await client.query("ROLLBACK");
-      res.status(404).json({ message: "No assessment questions found for tier" });
+      res
+        .status(404)
+        .json({ message: "No assessment questions found for tier" });
       return;
     }
 
