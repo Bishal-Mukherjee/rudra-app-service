@@ -156,8 +156,11 @@ router.get("/:tier/questions", getTierQuestions);
  *                       type: string
  *                       format: uuid
  *                     option:
- *                       type: string
- *                       format: uuid
+ *                       type: array
+ *                       minItems: 1
+ *                       items:
+ *                         type: string
+ *                         format: uuid
  *     responses:
  *       200:
  *         description: Tier assessment submitted successfully
