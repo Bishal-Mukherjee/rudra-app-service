@@ -1,8 +1,11 @@
+export type TierQuestionType = "SINGLE-SELECT" | "MULTI-SELECT";
+
 export type TierQuestionRow = {
   id: string;
   index: number;
   label_en: string;
   label_bn: string;
+  type: TierQuestionType;
 };
 
 export type TierQuestionOptionRow = {
@@ -16,7 +19,7 @@ export type TierQuestionOptionRow = {
 
 export type AssessmentAnswer = {
   question: string;
-  option: string;
+  option: string[];
 };
 
 export type SubmitAssessmentBody = {

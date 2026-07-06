@@ -5,6 +5,7 @@ import {
   SubmitAssessmentBody,
   TierQuestionOptionRow,
   TierQuestionRow,
+  TierQuestionType,
 } from "@/controllers/tier-assessment/types";
 
 const TIER_PATTERN = /^TIER_\d+$/;
@@ -14,6 +15,45 @@ const isAssessableTier = (tier: string): boolean => TIER_PATTERN.test(tier);
 const getNextTier = (currentTier: string): string => {
   const tierLevel = currentTier.split("_").pop();
   return `TIER_${parseInt(tierLevel || "0", 10) + 1}`;
+};
+
+const setsMatch = (a: string[], b: string[]): boolean => {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
+
+  return sortedA.every((value, index) => value === sortedB[index]);
+};
+
+const isQuestionAnswerCorrect = (
+  questionType: TierQuestionType,
+  selectedOptionIds: string[],
+  questionOptions: TierQuestionOptionRow[],
+): boolean => {
+  const uniqueSelected = [...new Set(selectedOptionIds)];
+
+  if (uniqueSelected.length !== selectedOptionIds.length) {
+    return false;
+  }
+
+  const validOptionIds = new Set(questionOptions.map((option) => option.id));
+
+  if (!uniqueSelected.every((optionId) => validOptionIds.has(optionId))) {
+    return false;
+  }
+
+  if (questionType === "SINGLE-SELECT" && uniqueSelected.length !== 1) {
+    return false;
+  }
+
+  const correctOptionIds = questionOptions
+    .filter((option) => option.is_correct)
+    .map((option) => option.id);
+
+  return setsMatch(uniqueSelected, correctOptionIds);
 };
 
 export const getTierQuestions = async (
@@ -47,7 +87,7 @@ export const getTierQuestions = async (
     }
 
     const { rows: questionRows } = await pool.query<TierQuestionRow>(
-      `SELECT id, index, label_en, label_bn
+      `SELECT id, index, label_en, label_bn, type
        FROM tier_questions
        WHERE tier = $1 AND is_active = true
        ORDER BY index ASC`,
@@ -83,6 +123,7 @@ export const getTierQuestions = async (
 
     const questions = questionRows.map((question) => ({
       topic: question.id, // was id, now topic
+      type: question.type,
       label: {
         en: question.label_en,
         bn: question.label_bn,
@@ -94,7 +135,6 @@ export const getTierQuestions = async (
           bn: option.label_bn,
         },
       })),
-      type: "SINGLE-SELECT", // hardcoded for now
     }));
 
     res.status(200).json({
@@ -157,7 +197,7 @@ export const submitTierAssessment = async (
     }
 
     const { rows: questionRows } = await client.query<TierQuestionRow>(
-      `SELECT id, index, label_en, label_bn
+      `SELECT id, index, label_en, label_bn, type
        FROM tier_questions
        WHERE tier = $1 AND is_active = true
        ORDER BY index ASC`,
@@ -172,6 +212,14 @@ export const submitTierAssessment = async (
       return;
     }
 
+    const questionsById = questionRows.reduce<Record<string, TierQuestionRow>>(
+      (acc, question) => {
+        acc[question.id] = question;
+        return acc;
+      },
+      {},
+    );
+
     const questionIds = new Set(questionRows.map((question) => question.id));
     const submittedQuestionIds = new Set<string>();
 
@@ -185,6 +233,24 @@ export const submitTierAssessment = async (
       if (submittedQuestionIds.has(answer.question)) {
         await client.query("ROLLBACK");
         res.status(400).json({ message: "Duplicate answers for question" });
+        return;
+      }
+
+      const question = questionsById[answer.question];
+
+      if (question.type === "SINGLE-SELECT" && answer.option.length !== 1) {
+        await client.query("ROLLBACK");
+        res
+          .status(400)
+          .json({
+            message: "Single-select question must have exactly 1 option",
+          });
+        return;
+      }
+
+      if (new Set(answer.option).size !== answer.option.length) {
+        await client.query("ROLLBACK");
+        res.status(400).json({ message: "Duplicate options in submission" });
         return;
       }
 
@@ -217,18 +283,16 @@ export const submitTierAssessment = async (
     let correctCount = 0;
 
     for (const answer of answers) {
+      const question = questionsById[answer.question];
       const questionOptions = optionsByQuestionId[answer.question] || [];
-      const selectedOption = questionOptions.find(
-        (option) => option.id === answer.option,
+
+      const isCorrect = isQuestionAnswerCorrect(
+        question.type,
+        answer.option,
+        questionOptions,
       );
 
-      if (!selectedOption) {
-        await client.query("ROLLBACK");
-        res.status(400).json({ message: "Invalid option for question" });
-        return;
-      }
-
-      if (selectedOption.is_correct) {
+      if (isCorrect) {
         correctCount += 1;
       }
     }
