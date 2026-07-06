@@ -135,7 +135,6 @@ export const getTierQuestions = async (
           bn: option.label_bn,
         },
       })),
-      type: "SINGLE-SELECT", // hardcoded for now
     }));
 
     res.status(200).json({
