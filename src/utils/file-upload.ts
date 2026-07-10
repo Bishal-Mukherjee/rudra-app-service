@@ -9,6 +9,7 @@ interface UploadOptions {
   bucket: string;
   folder?: string;
   maxSize?: number; // in MB
+  doRename?: boolean; // rename file to a generated id instead of keeping original name
 }
 
 interface UploadResult {
@@ -23,7 +24,7 @@ export const uploadFileToStorage = async (
   file: Express.Multer.File,
   options: UploadOptions,
 ): Promise<UploadResult> => {
-  const { bucket, folder = "uploads", maxSize = 15 } = options;
+  const { bucket, folder = "uploads", maxSize = 15, doRename = true } = options;
 
   try {
     // Check file size
@@ -35,9 +36,12 @@ export const uploadFileToStorage = async (
       };
     }
 
-    const extension = path.extname(file.originalname);
-    const fileId = nanoid();
-    const fileName = `${fileId}${extension}`;
+    let fileName = file.originalname;
+    if (doRename) {
+      const extension = path.extname(file.originalname);
+      const fileId = nanoid();
+      fileName = `${fileId}${extension}`;
+    }
     const objectKey = `${bucket}/${folder}/${fileName}`;
 
     await s3Client.send(

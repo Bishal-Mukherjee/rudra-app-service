@@ -28,6 +28,7 @@ export const uploadLog = async (req: Request, res: Response) => {
     const uploadResult = await uploadFileToStorage(file, {
       bucket: "device-logs",
       folder: `${req.user.id}/${deviceId}/${getDateString()}/${type}`,
+      doRename: false,
     });
 
     if (!uploadResult.success) {
