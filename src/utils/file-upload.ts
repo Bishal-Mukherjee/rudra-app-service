@@ -93,9 +93,9 @@ export const createUploadMiddleware = (maxSizeMB: number = 15) => {
 
 export const uploadMiddleware = createUploadMiddleware(15);
 
-const LOG_FILE_EXTENSIONS = [".db", ".txt"];
+// const LOG_FILE_EXTENSIONS = [".db", ".txt"];
 
-const createLogFileFilter = (maxSizeMB: number = 15) => {
+const createLogFileFilter = (maxSizeMB: number = 10) => {
   return (
     req: any,
     file: Express.Multer.File,
@@ -110,16 +110,17 @@ const createLogFileFilter = (maxSizeMB: number = 15) => {
       return cb(error, false);
     }
 
-    const extension = path.extname(file.originalname).toLowerCase();
-    if (!LOG_FILE_EXTENSIONS.includes(extension)) {
-      return cb(new Error("Only .db and .txt files are allowed"));
-    }
+    // No file type restriction for now.
+    // const extension = path.extname(file.originalname).toLowerCase();
+    // if (!LOG_FILE_EXTENSIONS.includes(extension)) {
+    //   return cb(new Error("Only .db and .txt files are allowed"));
+    // }
 
     cb(null, true);
   };
 };
 
-export const createLogUploadMiddleware = (maxSizeMB: number = 15) => {
+export const createLogUploadMiddleware = (maxSizeMB: number = 10) => {
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -131,4 +132,4 @@ export const createLogUploadMiddleware = (maxSizeMB: number = 15) => {
   return upload.single("file");
 };
 
-export const logUploadMiddleware = createLogUploadMiddleware(15);
+export const logUploadMiddleware = createLogUploadMiddleware(10);

@@ -6,11 +6,16 @@ const router = express.Router();
 
 /**
  * @swagger
- * /upload-log:
+ * /log:
  *   post:
- *     summary: Upload a log file
- *     description: Upload a .db or .txt log file to the logs storage bucket.
+ *     summary: Upload a device log file
+ *     description: >
+ *       Upload a device log file to S3 under
+ *       device-logs/{user_id}/{device_id}/{date}/{type}/{file}.
+ *       If no auth token is provided, {user_id} is "UNKNOWN".
  *     tags: [Logs]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -20,10 +25,18 @@ const router = express.Router();
  *             required:
  *               - file
  *             properties:
+ *               deviceId:
+ *                 type: string
+ *                 description: Optional device identifier
+ *               type:
+ *                 type: string
+ *                 enum: [regular, forced]
+ *                 default: regular
+ *                 description: Type of log upload
  *               file:
  *                 type: string
  *                 format: binary
- *                 description: Log file (.db or .txt)
+ *                 description: Log file to upload
  *     responses:
  *       200:
  *         description: Log file uploaded successfully
@@ -40,18 +53,13 @@ const router = express.Router();
  *                   properties:
  *                     filePath:
  *                       type: string
- *                     publicUrl:
- *                       type: string
- *                       description: Public URL to access the uploaded log file
  *       400:
- *         description: No file provided or invalid file type
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
+ *         description: No file provided or invalid type
  *       413:
  *         description: File size exceeds maximum allowed limit
  *       500:
  *         description: Internal server error or upload failure
  */
-router.post("/upload", logUploadMiddleware, uploadLog);
+router.post("/", logUploadMiddleware, uploadLog);
 
 export default router;
