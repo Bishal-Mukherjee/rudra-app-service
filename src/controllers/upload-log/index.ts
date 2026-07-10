@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { uploadFileToStorage } from "@/utils/file-upload";
 
+const LOG_TYPES = ["regular", "forced"] as const;
+type LogType = (typeof LOG_TYPES)[number];
+
+const getDateString = () => new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+
 export const uploadLog = async (req: Request, res: Response) => {
   try {
     const file = req.file;
@@ -10,9 +15,19 @@ export const uploadLog = async (req: Request, res: Response) => {
       return;
     }
 
+    const deviceId = (req.body.deviceId as string | undefined) || "Unknown";
+    const type = (req.body.type as string | undefined) || "regular";
+
+    if (!LOG_TYPES.includes(type as LogType)) {
+      res.status(400).json({
+        message: `Invalid type. Must be one of: ${LOG_TYPES.join(", ")}`,
+      });
+      return;
+    }
+
     const uploadResult = await uploadFileToStorage(file, {
       bucket: "device-logs",
-      folder: "uploads",
+      folder: `${req.user.id}/${deviceId}/${getDateString()}/${type}`,
     });
 
     if (!uploadResult.success) {
@@ -21,13 +36,7 @@ export const uploadLog = async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(200).json({
-      message: "Log file uploaded successfully",
-      result: {
-        filePath: uploadResult.filePath,
-        publicUrl: uploadResult.publicUrl,
-      },
-    });
+    res.status(200).json({ message: "File uploaded successfully" });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Internal server error" });
