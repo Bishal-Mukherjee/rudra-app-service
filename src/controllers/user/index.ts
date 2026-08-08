@@ -19,7 +19,8 @@ export const getUserDetails = async (req: Request, res: Response) => {
 		status,
 		occupation,
 		created_at AS "createdAt",
-		last_active_at AS "lastActiveAt"
+		last_active_at AS "lastActiveAt",
+		config
 		FROM users WHERE id = $1
 		`,
       [id],
@@ -28,6 +29,15 @@ export const getUserDetails = async (req: Request, res: Response) => {
     if (query.rows.length === 0) {
       res.status(404).json({ message: "User not found" });
       return;
+    }
+
+    const { config = {}, ...rest } = query.rows[0];
+
+    const currentDate = new Date().toISOString().split("T")[0];
+    let allowForceSync = false;
+
+    if (config) {
+      allowForceSync = config?.forceSyncScheduledDate === currentDate;
     }
 
     const { rows: questionsRows } = await pool.query(
@@ -51,6 +61,11 @@ export const getUserDetails = async (req: Request, res: Response) => {
     );
     const modulesLastUpdatedAt = modulesRows[0].lastupdatedat;
 
+    const { rows: tierQuestionsRows } = await pool.query(
+      `SELECT MAX(last_updated_at) AS lastUpdatedAt FROM tier_questions`,
+    );
+    const tierQuestionsLastUpdatedAt = tierQuestionsRows[0].lastupdatedat;
+
     const { rows: notificationsRows } = await pool.query(
       `SELECT MAX(created_at) AS lastUpdatedAt FROM notifications WHERE recipient_role = $1`,
       [query.rows[0].role],
@@ -62,14 +77,16 @@ export const getUserDetails = async (req: Request, res: Response) => {
       species: speciesLastUpdatedAt,
       tier: tierLastUpdatedAt,
       modules: modulesLastUpdatedAt,
+      tierQuestions: tierQuestionsLastUpdatedAt,
       notifications: notificationsLastUpdatedAt,
     };
 
     res.status(200).json({
       message: "User details fetched successfully",
-      result: query.rows[0],
+      result: rest,
       config: {
         lastUpdatedAt,
+        allowForceSync,
         supportEmail:
           "support@sample.com, support2@sample.com, support3@sample.com", // TODO: Replace with actual support email
       },

@@ -1,6 +1,7 @@
 import express from "express";
 import { authenticate } from "@/middlewares/authenticate";
 // import { authenticateAdmin } from "@/middlewares/authenticate-admin";
+import { authenticateOptional } from "@/middlewares/authenticate-optional";
 import authRoutes from "@/routes/auth";
 import userRoutes from "@/routes/user";
 import speciesRoutes from "@/routes/species";
@@ -14,6 +15,7 @@ import submissionRoutes from "@/routes/submission";
 import notificationRoutes from "@/routes/notifications";
 import resourceRoutes from "@/routes/resource";
 import reportsRoutes from "@/routes/reports";
+import uploadLogRoutes from "@/routes/upload-log";
 
 const router = express.Router();
 
@@ -30,5 +32,6 @@ router.use("/module", authenticate, moduleRoutes);
 router.use("/notifications", authenticate, notificationRoutes);
 router.use("/resource", authenticate, resourceRoutes);
 router.use("/reports", reportsRoutes);
+router.use("/log", authenticateOptional, uploadLogRoutes);
 
 export { router };
