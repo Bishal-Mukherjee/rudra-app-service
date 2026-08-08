@@ -43,7 +43,7 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/rudra-app-service:${{ env.IMAGE_TAG }}
 
   deploy-production:
-    runs-on: self-hosted
+    runs-on: [self-hosted, production]
     needs: build
     if: github.ref == 'refs/heads/main'
     environment: production
